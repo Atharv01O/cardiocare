@@ -22,7 +22,9 @@ from utils.who_api          import get_who_cvd_data
 from utils.comparator       import compare_reports
 from utils.auth             import create_user, get_user_by_email, get_user_by_id
 from utils.blood_analyser   import analyse_blood_report
+from dotenv import load_dotenv
 
+load_dotenv()
 from pymongo import MongoClient
 
 client = MongoClient(
