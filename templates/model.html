@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}— AI Model{% endblock %}
+{% block page_title %}AI Model Info{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
+{% endblock %}
+
+{% block content %}
+
+<div class="model-grid">
+
+  <div class="chart-card">
+    <h3 class="chart-title">🧠 Model Architecture</h3>
+    <table class="report-table">
+      <thead><tr><th>Layer</th><th>Type</th><th>Units</th><th>Activation</th></tr></thead>
+      <tbody>
+        <tr><td>Input</td><td>Dense</td><td>128</td><td>ReLU</td></tr>
+        <tr><td>–</td><td>BatchNorm + Dropout 0.3</td><td>–</td><td>–</td></tr>
+        <tr><td>Hidden 1</td><td>Dense</td><td>64</td><td>ReLU</td></tr>
+        <tr><td>–</td><td>BatchNorm + Dropout 0.3</td><td>–</td><td>–</td></tr>
+        <tr><td>Hidden 2</td><td>Dense</td><td>32</td><td>ReLU</td></tr>
+        <tr><td>–</td><td>Dropout 0.2</td><td>–</td><td>–</td></tr>
+        <tr><td>Output</td><td>Dense</td><td>1</td><td>Sigmoid</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-card">
+    <h3 class="chart-title">📊 Training Details</h3>
+    <table class="report-table">
+      <tbody>
+        <tr><td>Dataset</td><td>UCI Cleveland Heart Disease</td></tr>
+        <tr><td>Features</td><td>13 clinical attributes</td></tr>
+        <tr><td>Optimizer</td><td>Adam</td></tr>
+        <tr><td>Loss</td><td>Binary Crossentropy</td></tr>
+        <tr><td>Epochs</td><td>Up to 150 (Early Stopping)</td></tr>
+        <tr><td>Batch Size</td><td>32</td></tr>
+        <tr><td>Train / Test Split</td><td>80% / 20%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-card wide">
+    <h3 class="chart-title">📋 Feature Reference</h3>
+    <table class="report-table">
+      <thead><tr><th>Feature</th><th>Description</th><th>Range</th></tr></thead>
+      <tbody>
+        <tr><td>age</td><td>Age of the patient</td><td>20 – 80</td></tr>
+        <tr><td>sex</td><td>Sex (1=Male, 0=Female)</td><td>0 / 1</td></tr>
+        <tr><td>cp</td><td>Chest pain type</td><td>0 – 3</td></tr>
+        <tr><td>trestbps</td><td>Resting blood pressure (mmHg)</td><td>80 – 200</td></tr>
+        <tr><td>chol</td><td>Serum cholesterol (mg/dl)</td><td>100 – 600</td></tr>
+        <tr><td>fbs</td><td>Fasting blood sugar > 120 mg/dl</td><td>0 / 1</td></tr>
+        <tr><td>restecg</td><td>Resting ECG results</td><td>0 – 2</td></tr>
+        <tr><td>thalach</td><td>Maximum heart rate achieved</td><td>60 – 220</td></tr>
+        <tr><td>exang</td><td>Exercise induced angina</td><td>0 / 1</td></tr>
+        <tr><td>oldpeak</td><td>ST depression induced by exercise</td><td>0 – 6</td></tr>
+        <tr><td>slope</td><td>Slope of peak exercise ST segment</td><td>0 – 2</td></tr>
+        <tr><td>ca</td><td>Number of major vessels (fluoroscopy)</td><td>0 – 3</td></tr>
+        <tr><td>thal</td><td>Thalassemia type</td><td>0 – 2</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-card">
+    <h3 class="chart-title">⚠️ Disclaimer</h3>
+    <p style="color:#666;line-height:1.8;font-size:0.95rem;">
+      This AI model is trained on the UCI Cleveland Heart Disease dataset for
+      <strong>educational and research purposes only</strong>. It is NOT intended
+      for clinical diagnosis. All medical decisions must be made by qualified
+      healthcare professionals. The model's predictions carry inherent uncertainty
+      and should not replace a proper medical evaluation.
+    </p>
+  </div>
+
+</div>
+
+{% endblock %}

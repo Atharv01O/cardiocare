@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}— Compare Reports{% endblock %}
+{% block page_title %}Compare Reports{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/compare.css') }}"/>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Picker Card ── -->
+<div class="picker-card">
+  <h3 class="picker-title">🔄 Select Two Reports to Compare</h3>
+  <p class="picker-sub">Pick any two past assessments — we'll show you exactly what changed and whether it improved.</p>
+
+  {% if error %}
+  <div class="alert alert-error">⚠️ {{ error }}</div>
+  {% endif %}
+
+  {% if all_reports and all_reports | length >= 2 %}
+  <form method="POST" action="{{ url_for('compare') }}" class="picker-form">
+    <div class="picker-selects">
+
+      <div class="picker-group">
+        <label class="picker-label">📅 Report A (newer / current)</label>
+        <select name="new_id" class="picker-select" required>
+          <option value="">— Select report —</option>
+          {% for r in all_reports %}
+          <option value="{{ r._id }}" {% if result and r._id == new_report._id %}selected{% endif %}>
+            {{ r.date }} · {{ r.risk }} · Score: {{ r.score }}%
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="picker-vs">VS</div>
+
+      <div class="picker-group">
+        <label class="picker-label">📁 Report B (older / baseline)</label>
+        <select name="old_id" class="picker-select" required>
+          <option value="">— Select report —</option>
+          {% for r in all_reports %}
+          <option value="{{ r._id }}" {% if result and r._id == old_report._id %}selected{% endif %}>
+            {{ r.date }} · {{ r.risk }} · Score: {{ r.score }}%
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+    <button type="submit" class="btn btn-primary" style="margin-top:16px">Compare Reports →</button>
+  </form>
+
+  {% elif all_reports | length < 2 %}
+  <div class="empty-state" style="padding:32px 0">
+    <div class="empty-icon">📊</div>
+    <p>You need at least <strong>2 saved reports</strong> to compare.<br>
+    <a href="{{ url_for('predict') }}">Make a prediction</a> to get started.</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ── Results (only shown after form submit) ── -->
+{% if result %}
+
+<!-- Score Banner -->
+<div class="compare-banner">
+  <div class="cb-report new">
+    <div class="cb-label">Report A</div>
+    <div class="cb-date">{{ result.new_date }}</div>
+    <div class="cb-score">{{ result.new_score }}<span>/100</span></div>
+    <span class="risk-badge {{ result.new_risk | lower | replace(' ','') }}">{{ result.new_risk }}</span>
+  </div>
+
+  <div class="cb-delta">
+    {% set d = result.score_delta %}
+    {% if d < 0 %}
+      <div class="delta-arrow good">▼ {{ "%.1f"|format(d|abs) }}</div>
+      <div class="delta-label">Risk Improved</div>
+    {% elif d > 0 %}
+      <div class="delta-arrow bad">▲ {{ "%.1f"|format(d) }}</div>
+      <div class="delta-label">Risk Increased</div>
+    {% else %}
+      <div class="delta-arrow neutral">= 0</div>
+      <div class="delta-label">No Change</div>
+    {% endif %}
+  </div>
+
+  <div class="cb-report old">
+    <div class="cb-label">Report B</div>
+    <div class="cb-date">{{ result.old_date }}</div>
+    <div class="cb-score">{{ result.old_score }}<span>/100</span></div>
+    <span class="risk-badge {{ result.old_risk | lower | replace(' ','') }}">{{ result.old_risk }}</span>
+  </div>
+</div>
+
+<!-- Score Bar Chart -->
+<div class="chart-card" style="margin-bottom:20px">
+  <h3 class="chart-title">Risk Score Comparison</h3>
+  <div style="max-width:440px; margin:0 auto; height:200px">
+    <canvas id="scoreBar"></canvas>
+  </div>
+</div>
+
+<!-- Parameter Table -->
+<div class="table-card">
+  <h3 class="chart-title">Parameter-by-Parameter Breakdown</h3>
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Report B (baseline)</th>
+        <th>Report A (current)</th>
+        <th>Change</th>
+        <th>Assessment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in result.rows %}
+      <tr class="fade-row">
+        <td class="param-name">{{ row.label }}</td>
+        <td class="old-val">{{ row.old_val }}</td>
+        <td class="new-val"><strong>{{ row.new_val }}</strong></td>
+        <td class="delta-cell">
+          {% if row.delta is not none and row.delta != 0 %}
+            <span class="delta {{ row.good }}">
+              {% if row.direction == 'up' %}▲{% else %}▼{% endif %}
+              {{ row.delta | abs }}
+            </span>
+          {% elif row.old_val != row.new_val %}
+            <span class="delta neutral">changed</span>
+          {% else %}
+            <span class="delta neutral">—</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if row.good == 'good' %}
+            <span class="assess good">✅ Improved</span>
+          {% elif row.good == 'bad' %}
+            <span class="assess bad">⚠️ Worsened</span>
+          {% else %}
+            <span class="assess neutral">— Neutral</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{% if result %}
+<script>
+  const NEW_SCORE = {{ result.new_score }};
+  const OLD_SCORE = {{ result.old_score }};
+  const NEW_DATE  = "{{ result.new_date }}";
+  const OLD_DATE  = "{{ result.old_date }}";
+</script>
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endif %}
+{% endblock %}

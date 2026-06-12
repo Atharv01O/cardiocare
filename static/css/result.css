@@ -1,0 +1,99 @@
+.result-layout { display: flex; flex-direction: column; gap: 22px; }
+
+/* ── Risk Banner ── */
+.risk-banner {
+  display: flex; align-items: center; gap: 20px;
+  padding: 22px 28px; border-radius: var(--radius);
+  box-shadow: var(--shadow); animation: fadeUp 0.4s ease both;
+  color: #fff;
+}
+.risk-banner.green  { background: linear-gradient(135deg, #16a34a, #15803d); }
+.risk-banner.orange { background: linear-gradient(135deg, #ea580c, #c2410c); }
+.risk-banner.red    { background: linear-gradient(135deg, #dc2626, #991b1b); }
+
+.risk-icon  { font-size: 2.5rem; flex-shrink: 0; }
+.risk-info  { flex: 1; }
+.risk-level { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; }
+.risk-message { font-size: 0.9rem; margin-top: 4px; opacity: 0.9; line-height: 1.5; }
+.risk-score { text-align: center; background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 20px; }
+.score-number { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+.score-label  { font-size: 0.72rem; opacity: 0.8; margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── Gauge ── */
+.gauge-card { background: var(--white); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
+.gauge-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; }
+.gauge-wrap { display: flex; justify-content: center; }
+
+/* ── Two Cols ── */
+.result-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.result-card { background: var(--white); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); border: 1px solid var(--border); animation: fadeUp 0.5s ease both; }
+.rc-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.rc-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.rc-list li { font-size: 0.88rem; color: var(--text); padding-left: 16px; position: relative; line-height: 1.5; }
+.rc-list li::before { content: "•"; position: absolute; left: 0; color: var(--accent2); font-weight: 700; }
+.rc-list.care li::before { color: var(--green); }
+
+/* ── Summary ── */
+.summary-card { background: var(--white); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.summary-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 16px; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.summary-item { background: #f8fafc; border-radius: 8px; padding: 10px 14px; }
+.si-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.si-value { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+/* ── Actions ── */
+.action-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ── Gemini Section ── */
+.gemini-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: var(--radius); padding: 28px;
+  border: 1px solid #334155; animation: fadeUp 0.5s ease both;
+}
+.gemini-header { margin-bottom: 22px; }
+.gemini-badge {
+  display: inline-block; background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  color: #fff; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px;
+  padding: 3px 12px; border-radius: 20px; margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.gemini-header h3 { color: #f1f5f9; font-size: 1.1rem; margin-bottom: 6px; }
+.gemini-sub { color: #64748b; font-size: 0.85rem; }
+
+.explanations-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.exp-card {
+  background: #1e293b; border-radius: 10px; padding: 16px;
+  border-left: 3px solid #334155;
+}
+.exp-card.status-normal     { border-left-color: #16a34a; }
+.exp-card.status-borderline { border-left-color: #ea580c; }
+.exp-card.status-concerning { border-left-color: #dc2626; }
+
+.exp-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.exp-param { font-weight: 700; color: #e2e8f0; font-size: 0.88rem; }
+.exp-value { font-size: 0.82rem; color: #64748b; background: #0f172a; padding: 1px 8px; border-radius: 4px; }
+.exp-badge { font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: auto; }
+.exp-badge.normal     { background: #14532d; color: #86efac; }
+.exp-badge.borderline { background: #7c2d12; color: #fdba74; }
+.exp-badge.concerning { background: #7f1d1d; color: #fca5a5; }
+.exp-text { color: #94a3b8; font-size: 0.83rem; line-height: 1.6; margin: 0; }
+
+.gemini-empty { text-align: center; padding: 24px; color: #475569; font-size: 0.88rem; }
+.gemini-empty code { background: #0f172a; padding: 2px 8px; border-radius: 4px; color: #7c3aed; }
+
+/* ── Compare Card ── */
+.compare-card {
+  background: var(--white); border-radius: var(--radius); padding: 22px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent2);
+}
+.compare-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+.compare-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 16px; }
+.compare-form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.compare-select {
+  flex: 1; min-width: 280px; padding: 9px 12px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 0.88rem; color: var(--text); background: #fafafa; outline: none;
+}
+.compare-select:focus { border-color: var(--accent2); }

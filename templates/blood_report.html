@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}— Blood Report{% endblock %}
+{% block page_title %}Blood Report Analysis{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/blood.css') }}"/>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Upload Card ── -->
+<div class="upload-card">
+  <div class="upload-header">
+    <div class="upload-icon">🩸</div>
+    <div>
+      <h3>Upload Your Blood Report</h3>
+      <p>Upload a PDF or image of your blood test — Gemini AI will extract all values and flag anything heart-related.</p>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-error">⚠️ {{ error }}</div>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+    <div class="drop-zone" id="dropZone">
+      <div class="dz-icon">📄</div>
+      <div class="dz-text">Drag & drop your report here</div>
+      <div class="dz-sub">or click to browse — PDF, JPG, PNG supported</div>
+      <input type="file" name="report_file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" required/>
+    </div>
+    <div class="file-preview" id="filePreview" style="display:none">
+      <span class="fp-icon">📎</span>
+      <span class="fp-name" id="fpName"></span>
+      <span class="fp-size" id="fpSize"></span>
+    </div>
+    <button type="submit" class="btn btn-primary upload-btn" id="uploadBtn">
+      🔬 Analyse with Gemini AI
+    </button>
+  </form>
+
+  <div class="upload-note">
+    ⚕️ Your report is analysed in real-time and not stored. Always consult a doctor for medical decisions.
+  </div>
+</div>
+
+<!-- ── Results ── -->
+{% if result %}
+
+  {% if result.error %}
+  <div class="alert alert-error">⚠️ {{ result.error }}</div>
+
+  {% else %}
+  <!-- Heart-Relevant Values -->
+  {% if result.heart_relevant %}
+  <div class="results-section">
+    <div class="rs-header heart">
+      <span class="rs-icon">❤️</span>
+      <div>
+        <div class="rs-title">Heart-Relevant Values</div>
+        <div class="rs-sub">{{ result.heart_relevant|length }} values found that may affect cardiovascular health</div>
+      </div>
+    </div>
+    <div class="values-grid">
+      {% for item in result.heart_relevant %}
+      <div class="value-card status-{{ item.status }}">
+        <div class="vc-top">
+          <span class="vc-test">{{ item.test }}</span>
+          <span class="vc-badge {{ item.status }}">
+            {% if item.status == 'normal' %}✅ Normal
+            {% elif item.status == 'borderline' %}⚠️ Borderline
+            {% elif item.status == 'high' %}🔴 High
+            {% elif item.status == 'low' %}🔵 Low
+            {% else %}🚨 Critical{% endif %}
+          </span>
+        </div>
+        <div class="vc-value">{{ item.value }} <span class="vc-unit">{{ item.unit }}</span></div>
+        <div class="vc-range">Normal: {{ item.normal_range }}</div>
+        <p class="vc-explanation">{{ item.explanation }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Other Values -->
+  {% if result.other %}
+  <div class="results-section">
+    <div class="rs-header other">
+      <span class="rs-icon">📋</span>
+      <div>
+        <div class="rs-title">Other Test Values</div>
+        <div class="rs-sub">{{ result.other|length }} additional values found</div>
+      </div>
+    </div>
+    <div class="other-table-wrap">
+      <table class="other-table">
+        <thead>
+          <tr><th>Test</th><th>Value</th><th>Normal Range</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for item in result.other %}
+          <tr>
+            <td>{{ item.test }}</td>
+            <td><strong>{{ item.value }} {{ item.unit }}</strong></td>
+            <td>{{ item.normal_range }}</td>
+            <td>
+              <span class="small-badge {{ item.status }}">
+                {% if item.status == 'normal' %}✅{% elif item.status == 'high' %}🔴{% elif item.status == 'low' %}🔵{% else %}⚠️{% endif %}
+                {{ item.status | capitalize }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="action-row" style="margin-top:20px">
+    <a href="{{ url_for('blood_report') }}" class="btn btn-secondary">📄 Analyse Another Report</a>
+    <a href="{{ url_for('predict') }}" class="btn btn-outline">🔍 Run Risk Prediction</a>
+  </div>
+  {% endif %}
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/blood.js') }}"></script>
+{% endblock %}

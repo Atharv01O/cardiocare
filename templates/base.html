@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CardioCare {% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}"/>
+  {% block extra_css %}{% endblock %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">❤️</span>
+      <span class="brand-name">CardioCare</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('dashboard') }}"    class="nav-link {% if request.endpoint=='dashboard'    %}active{% endif %}">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="{{ url_for('predict') }}"      class="nav-link {% if request.endpoint=='predict'      %}active{% endif %}">
+        <span class="nav-icon">🔍</span> Predict Risk
+      </a>
+      <a href="{{ url_for('blood_report') }}" class="nav-link {% if request.endpoint=='blood_report' %}active{% endif %}">
+        <span class="nav-icon">🩸</span> Blood Report
+      </a>
+      <a href="{{ url_for('history') }}"      class="nav-link {% if request.endpoint=='history'      %}active{% endif %}">
+        <span class="nav-icon">📋</span> History
+      </a>
+      <a href="{{ url_for('compare') }}"      class="nav-link {% if request.endpoint=='compare'      %}active{% endif %}">
+        <span class="nav-icon">🔄</span> Compare
+      </a>
+      <a href="{{ url_for('model_info') }}"   class="nav-link {% if request.endpoint=='model_info'   %}active{% endif %}">
+        <span class="nav-icon">🧠</span> AI Model
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>CardioCare v1.0</span>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+      <div class="topbar-right">
+        <span class="status-dot"></span>
+        <span class="status-text">AI Model Active</span>
+
+        <!-- Profile dropdown -->
+        <div class="profile-menu">
+          <div class="profile-btn" onclick="toggleProfileMenu()">
+            <div class="profile-avatar">{{ current_user.name[0].upper() }}</div>
+            <span class="profile-name">{{ current_user.name }}</span>
+            <span class="profile-caret">▾</span>
+          </div>
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="pd-info">
+              <div class="pd-name">{{ current_user.name }}</div>
+              <div class="pd-email">{{ current_user.email }}</div>
+            </div>
+            <div class="pd-divider"></div>
+            <a href="{{ url_for('logout') }}" class="pd-item logout">🚪 Sign Out</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-body">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <!-- ── Gemini Floating Chat ── -->
+  <div class="chat-bubble" id="chatBubble" onclick="toggleChat()" title="Ask CardioCare Assistant">
+    💬
+    <span class="chat-unread" id="chatUnread" style="display:none">1</span>
+  </div>
+
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <span class="chat-avatar">✨</span>
+        <div>
+          <div class="chat-title">CardioCare Assistant</div>
+          <div class="chat-subtitle">Powered by Gemini AI</div>
+        </div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-context-badge" id="chatContextBadge" style="display:none">
+      📋 Aware of your latest report
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg assistant">
+        <div class="msg-bubble">👋 Hi {{ current_user.name.split()[0] }}! Ask me anything about your heart health parameters or results.</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Ask about your results..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+      <button class="chat-send" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+  <script>
+    function toggleProfileMenu() {
+      document.getElementById("profileDropdown").classList.toggle("open");
+    }
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".profile-menu")) {
+        document.getElementById("profileDropdown")?.classList.remove("open");
+      }
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

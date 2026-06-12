@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}— Result{% endblock %}
+{% block page_title %}Prediction Result{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}"/>
+{% endblock %}
+
+{% block content %}
+
+<div class="result-layout">
+
+  <!-- ── Risk Banner ── -->
+  <div class="risk-banner {{ analysis.color }}">
+    <div class="risk-icon">{{ analysis.icon }}</div>
+    <div class="risk-info">
+      <div class="risk-level">{{ analysis.level }}</div>
+      <div class="risk-message">{{ analysis.message }}</div>
+    </div>
+    <div class="risk-score">
+      <div class="score-number">{{ score }}</div>
+      <div class="score-label">Risk Score / 100</div>
+    </div>
+  </div>
+
+  <!-- ── Gauge ── -->
+  <div class="gauge-card">
+    <h3>Risk Probability Meter</h3>
+    <div class="gauge-wrap">
+      <canvas id="gaugeChart" width="300" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- ── Two Cols: Symptoms + Care ── -->
+  <div class="result-cols">
+    <div class="result-card">
+      <h3 class="rc-title">🩺 Symptoms to Watch</h3>
+      <ul class="rc-list">
+        {% for s in analysis.symptoms %}<li>{{ s }}</li>{% endfor %}
+      </ul>
+    </div>
+    <div class="result-card">
+      <h3 class="rc-title">💊 Recommended Care</h3>
+      <ul class="rc-list care">
+        {% for c in analysis.care %}<li>{{ c }}</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- ── Input Summary ── -->
+  <div class="summary-card">
+    <h3>📋 Your Input Summary</h3>
+    <div class="summary-grid">
+      {% set labels = {
+        'age':'Age','sex':'Sex','cp':'Chest Pain Type',
+        'trestbps':'Resting BP','chol':'Cholesterol',
+        'fbs':'Fasting BS','restecg':'Resting ECG',
+        'thalach':'Max Heart Rate','exang':'Exercise Angina',
+        'oldpeak':'ST Depression','slope':'ST Slope',
+        'ca':'Major Vessels','thal':'Thalassemia'
+      } %}
+      {% for key, val in values.items() %}
+      <div class="summary-item">
+        <div class="si-label">{{ labels.get(key, key) }}</div>
+        <div class="si-value">{{ val }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ── Compare with Past Report ── -->
+  {% if past_reports %}
+  <div class="compare-card">
+    <h3>🔄 Compare with a Past Report</h3>
+    <p class="compare-sub">Select a previous assessment to see what changed.</p>
+    <form method="POST" action="{{ url_for('compare') }}" class="compare-form">
+      <input type="hidden" name="new_id" value="{{ new_id }}"/>
+      <select name="old_id" class="compare-select" required>
+        <option value="">— Select a past report —</option>
+        {% for r in past_reports %}
+        <option value="{{ r._id }}">
+          {{ r.date }} · {{ r.risk }} · Score: {{ r.score }}%
+        </option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-secondary">Compare →</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <!-- ── Actions ── -->
+  <div class="action-row">
+    <a href="{{ url_for('download', filename=pdf_file) }}" class="btn btn-primary">⬇️ Download PDF Report</a>
+    <a href="{{ url_for('predict') }}" class="btn btn-secondary">🔄 New Prediction</a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline">📊 Dashboard</a>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const RISK_SCORE = {{ score }};
+  const RISK_COLOR = "{{ analysis.color }}";
+
+  // Inject report context for Gemini chat
+  window.REPORT_CONTEXT = {
+    risk:      "{{ analysis.level }}",
+    score:     {{ score }},
+    age:       {{ values.age }},
+    sex:       "{{ 'Male' if values.sex == 1 else 'Female' }}",
+    chol:      {{ values.chol }},
+    trestbps:  {{ values.trestbps }},
+    thalach:   {{ values.thalach }},
+    oldpeak:   {{ values.oldpeak }},
+    exang:     {{ values.exang }},
+    ca:        {{ values.ca }},
+    cp_label:  "{{ ['Typical Angina','Atypical Angina','Non-Anginal Pain','Asymptomatic'][values.cp|int] }}",
+    thal_label:"{{ ['Normal','Fixed Defect','Reversible Defect'][values.thal|int] }}",
+  };
+</script>
+<script src="{{ url_for('static', filename='js/result.js') }}"></script>
+{% endblock %}

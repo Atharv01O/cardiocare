@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}— History{% endblock %}
+{% block page_title %}Report History{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
+{% endblock %}
+
+{% block content %}
+
+{% if reports %}
+<div class="table-card full">
+  <div class="table-header">
+    <h3>All Assessments ({{ reports | length }})</h3>
+  </div>
+  <table class="report-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Date</th>
+        <th>Score</th>
+        <th>Risk Level</th>
+        <th>Age</th>
+        <th>PDF</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reports %}
+      <tr class="fade-row">
+        <td>{{ loop.index }}</td>
+        <td>{{ r.date }}</td>
+        <td><span class="score-badge">{{ r.score }}%</span></td>
+        <td>
+          <span class="risk-badge {{ r.risk | lower | replace(' ','') }}">
+            {{ r.risk }}
+          </span>
+        </td>
+        <td>{{ r.values[0] | int if r.values else '—' }}</td>
+        <td><a href="{{ url_for('download', filename=r.pdf) }}" class="btn-small">⬇ PDF</a></td>
+        <td>
+          <a href="{{ url_for('delete_report', report_id=r._id) }}"
+             class="btn-small danger"
+             onclick="return confirm('Delete this report?')">🗑</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">📭</div>
+  <p>No reports found. <a href="{{ url_for('predict') }}">Make your first prediction</a>.</p>
+</div>
+{% endif %}
+
+{% endblock %}
