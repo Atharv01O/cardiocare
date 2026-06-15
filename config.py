@@ -14,7 +14,12 @@ REPORTS_DIR = os.path.join(BASE_DIR, "reports")
 # MONGODB
 # =========================
 
-MONGO_URI = "mongodb://localhost:27017/"
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DB  = "cardiocare"
 MONGO_COL = "reports"
 
