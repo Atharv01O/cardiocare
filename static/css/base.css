@@ -208,3 +208,27 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid #bbf7d0;
   flex-shrink: 0;
 }
+/* ── Profile Menu ── */
+.profile-menu     { position: relative; }
+.profile-btn      { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: background 0.2s; }
+.profile-btn:hover{ background: #f1f5f9; }
+.profile-avatar   { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.profile-name     { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.profile-caret    { font-size: 0.7rem; color: var(--muted); }
+
+.profile-dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  min-width: 200px; z-index: 200;
+  opacity: 0; pointer-events: none; transform: translateY(-6px);
+  transition: all 0.2s;
+}
+.profile-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+.pd-info    { padding: 14px 16px; }
+.pd-name    { font-weight: 700; font-size: 0.9rem; }
+.pd-email   { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+.pd-divider { height: 1px; background: var(--border); }
+.pd-item    { display: block; padding: 10px 16px; font-size: 0.88rem; color: var(--text); transition: background 0.15s; }
+.pd-item:hover  { background: #f8fafc; text-decoration: none; }
+.pd-item.logout { color: var(--red); }
