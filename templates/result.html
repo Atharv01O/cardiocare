@@ -18,7 +18,7 @@
       <div class="risk-message">{{ analysis.message }}</div>
     </div>
     <div class="risk-score">
-      <div class="score-number">{{ score }}</div>
+      <div class="score-number count-up" data-target="{{ score }}" data-decimals="1">0.0</div>
       <div class="score-label">Risk Score / 100</div>
     </div>
   </div>
@@ -47,6 +47,37 @@
     </div>
   </div>
 
+  <!-- ── Gemini: What does this mean for me? ── -->
+  <div class="gemini-card">
+    <div class="gemini-header">
+      <span class="gemini-badge">✨ Powered by Gemini AI</span>
+      <h3>What Do Your Numbers Mean For You?</h3>
+      <p class="gemini-sub">Personalised explanations of each clinical parameter based on your specific values.</p>
+    </div>
+
+    {% if explanations %}
+    <div class="explanations-grid">
+      {% for item in explanations %}
+      <div class="exp-card status-{{ item.status }}">
+        <div class="exp-top">
+          <span class="exp-param">{{ item.param }}</span>
+          <span class="exp-value">{{ item.value }}</span>
+          <span class="exp-badge {{ item.status }}">
+            {% if item.status == 'normal' %}✅ Normal
+            {% elif item.status == 'borderline' %}⚠️ Borderline
+            {% else %}🔴 Concerning{% endif %}
+          </span>
+        </div>
+        <p class="exp-text">{{ item.explanation }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="gemini-empty">
+      <p>Add your Gemini API key in <code>config.py</code> to enable personalised explanations.</p>
+    </div>
+    {% endif %}
+  </div>
 
   <!-- ── Input Summary ── -->
   <div class="summary-card">

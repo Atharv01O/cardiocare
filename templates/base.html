@@ -10,8 +10,11 @@
 </head>
 <body>
 
+  <!-- ── Sidebar Overlay (mobile) ── -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
   <!-- ── Sidebar ── -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <span class="brand-icon">❤️</span>
       <span class="brand-name">CardioCare</span>
@@ -46,7 +49,10 @@
   <!-- ── Main ── -->
   <main class="main-content">
     <header class="topbar">
-      <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+      </div>
       <div class="topbar-right">
         <span class="status-dot"></span>
         <span class="status-text">AI Model Active</span>
@@ -106,10 +112,15 @@
     </div>
   </div>
 
+  <script src="{{ url_for('static', filename='js/animate.js') }}"></script>
   <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
   <script>
     function toggleProfileMenu() {
       document.getElementById("profileDropdown").classList.toggle("open");
+    }
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("open");
+      document.getElementById("sidebarOverlay").classList.toggle("open");
     }
     document.addEventListener("click", (e) => {
       if (!e.target.closest(".profile-menu")) {

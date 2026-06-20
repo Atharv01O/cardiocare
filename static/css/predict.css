@@ -4,7 +4,7 @@
 .predict-form { display: flex; flex-direction: column; gap: 20px; }
 
 .form-section { background: var(--white); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); border: 1px solid var(--border); animation: fadeUp 0.4s ease both; }
-.section-title { font-size: 0.92rem; font-weight: 700; color: var(--accent); margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.section-title { font-family: var(--font-display); font-size: 0.92rem; font-weight: 700; color: var(--accent); margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
@@ -14,25 +14,27 @@
 
 .form-group input,
 .form-group select {
-  padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 8px;
-  font-size: 0.9rem; color: var(--text); background: #fafafa;
-  transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+  padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 9px;
+  font-size: 0.9rem; color: var(--text); background: #fbfaf8; font-family: var(--font-mono);
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s; outline: none;
 }
+.form-group select { font-family: var(--font-body); }
+.form-group input:hover, .form-group select:hover { border-color: #cbc6ba; }
 .form-group input:focus,
 .form-group select:focus {
-  border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(69,123,157,0.12);
+  border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(61,107,140,0.12);
   background: var(--white);
 }
 .form-group input.invalid { border-color: var(--red); }
 
 /* ── Submit Button ── */
 .btn-predict {
-  padding: 14px; background: var(--accent); color: #fff;
-  border: none; border-radius: 10px; font-size: 1rem; font-weight: 700;
-  cursor: pointer; transition: background 0.2s, transform 0.1s;
-  letter-spacing: 0.3px;
+  padding: 15px; background: var(--accent); color: #fff;
+  border: none; border-radius: 11px; font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+  letter-spacing: 0.01em; box-shadow: 0 2px 12px rgba(214,40,57,0.25);
 }
-.btn-predict:hover { background: #c1121f; transform: translateY(-1px); }
+.btn-predict:hover { background: var(--accent-d); transform: translateY(-1px); box-shadow: 0 4px 18px rgba(214,40,57,0.32); }
 .btn-predict:active { transform: translateY(0); }
 .btn-predict:disabled { background: #ccc; cursor: not-allowed; transform: none; }
 

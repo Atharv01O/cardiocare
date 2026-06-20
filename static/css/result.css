@@ -3,8 +3,8 @@
 /* ── Risk Banner ── */
 .risk-banner {
   display: flex; align-items: center; gap: 20px;
-  padding: 22px 28px; border-radius: var(--radius);
-  box-shadow: var(--shadow); animation: fadeUp 0.4s ease both;
+  padding: 24px 30px; border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); animation: fadeUp 0.45s cubic-bezier(0.16,1,0.3,1) both;
   color: #fff;
 }
 .risk-banner.green  { background: linear-gradient(135deg, #16a34a, #15803d); }
@@ -13,11 +13,11 @@
 
 .risk-icon  { font-size: 2.5rem; flex-shrink: 0; }
 .risk-info  { flex: 1; }
-.risk-level { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; }
-.risk-message { font-size: 0.9rem; margin-top: 4px; opacity: 0.9; line-height: 1.5; }
-.risk-score { text-align: center; background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 20px; }
-.score-number { font-size: 2.2rem; font-weight: 800; line-height: 1; }
-.score-label  { font-size: 0.72rem; opacity: 0.8; margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; }
+.risk-level { font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; letter-spacing: -0.02em; }
+.risk-message { font-size: 0.9rem; margin-top: 5px; opacity: 0.92; line-height: 1.55; max-width: 480px; }
+.risk-score { text-align: center; background: rgba(255,255,255,0.16); backdrop-filter: blur(8px); border-radius: 12px; padding: 14px 22px; }
+.score-number { font-family: var(--font-mono); font-size: 2.3rem; font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+.score-label  { font-size: 0.7rem; opacity: 0.85; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
 
 /* ── Gauge ── */
 .gauge-card { background: var(--white); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
@@ -27,7 +27,7 @@
 /* ── Two Cols ── */
 .result-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .result-card { background: var(--white); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); border: 1px solid var(--border); animation: fadeUp 0.5s ease both; }
-.rc-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.rc-title { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .rc-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
 .rc-list li { font-size: 0.88rem; color: var(--text); padding-left: 16px; position: relative; line-height: 1.5; }
 .rc-list li::before { content: "•"; position: absolute; left: 0; color: var(--accent2); font-weight: 700; }
