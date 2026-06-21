@@ -166,7 +166,7 @@ def predict():
         "date"     : datetime.now().strftime("%d-%m-%Y %H:%M"),
     }
 
-    create_pdf(report_doc, pdf_path)
+    create_pdf(report_doc, pdf_path, patient_name=current_user.name)
     inserted     = collection.insert_one(report_doc)
     new_id       = str(inserted.inserted_id)
     values_dict  = dict(zip(fields, values))
