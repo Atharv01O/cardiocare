@@ -1,64 +1,96 @@
 """
-CardioCare Professional PDF Report Generator
-Uses only ReportLab
+CardioCare Modern AI Report Generator
 pip install reportlab
 """
 
 import os
 from datetime import datetime
 
+from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.styles import (
-    getSampleStyleSheet,
-    ParagraphStyle
-)
-from reportlab.lib.units import cm
-
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle,
-    HRFlowable
-)
-
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
 
-# ===============================
+# =====================
 # COLORS
-# ===============================
+# =====================
 
-PRIMARY_RED = colors.HexColor("#C0392B")
-DARK_TEXT   = colors.HexColor("#2C3E50")
-LIGHT_BG    = colors.HexColor("#F4F6F7")
+RED = colors.HexColor("#C0392B")
+GREEN = colors.HexColor("#27AE60")
+BLUE = colors.HexColor("#1F3A68")
+PURPLE = colors.HexColor("#6C3483")
+ORANGE = colors.HexColor("#E67E22")
 
-GREEN       = colors.HexColor("#27AE60")
-ORANGE      = colors.HexColor("#E67E22")
-RED         = colors.HexColor("#E74C3C")
-
-WHITE       = colors.white
-
-
-RISK_COLORS = {
-    "Low Risk": GREEN,
-    "Moderate Risk": ORANGE,
-    "High Risk": RED
-}
+DARK = colors.HexColor("#1F2933")
+GREY = colors.HexColor("#6B7280")
+LIGHT = colors.HexColor("#F8FAFC")
+BORDER = colors.HexColor("#E5E7EB")
 
 
-def risk_color(level):
-    return RISK_COLORS.get(level, DARK_TEXT)
+# =====================
+# HELPERS
+# =====================
+
+def card(c, x, y, w, h):
+    c.setFillColor(colors.white)
+    c.setStrokeColor(BORDER)
+
+    c.roundRect(
+        x,
+        y,
+        w,
+        h,
+        radius=12,
+        stroke=1,
+        fill=1
+    )
+
+
+def text(c, value, x, y, size=10, color=DARK, bold=False):
+
+    c.setFillColor(color)
+
+    if bold:
+        c.setFont(
+            "Helvetica-Bold",
+            size
+        )
+    else:
+        c.setFont(
+            "Helvetica",
+            size
+        )
+
+    c.drawString(
+        x,
+        y,
+        str(value)
+    )
+
+
+def center(c,value,x,y,size,color=DARK):
+
+    c.setFont(
+        "Helvetica-Bold",
+        size
+    )
+
+    c.setFillColor(color)
+
+    c.drawCentredString(
+        x,
+        y,
+        value
+    )
 
 
 
-# ===============================
-# PDF GENERATOR
-# ===============================
+# =====================
+# MAIN PDF
+# =====================
 
-def create_pdf(report: dict, output_path: str):
+
+def create_pdf(report, output_path):
 
     os.makedirs(
         os.path.dirname(output_path),
@@ -66,118 +98,153 @@ def create_pdf(report: dict, output_path: str):
     )
 
 
-    doc = SimpleDocTemplate(
-
+    c = canvas.Canvas(
         output_path,
-
-        pagesize=A4,
-
-        leftMargin=1.8*cm,
-        rightMargin=1.8*cm,
-        topMargin=1.5*cm,
-        bottomMargin=1.5*cm
-
+        pagesize=A4
     )
 
 
-    styles = getSampleStyleSheet()
-
-    story = []
+    width,height = A4
 
 
-
-    # ===============================
+    # =====================
     # HEADER
-    # ===============================
+    # =====================
 
 
-    title_style = ParagraphStyle(
-
-        "title",
-
-        parent=styles["Normal"],
-
-        alignment=TA_CENTER,
-
-        fontSize=24,
-
-        textColor=PRIMARY_RED,
-
-        spaceAfter=8
-
+    text(
+        c,
+        "♥ CardioCare",
+        45,
+        height-60,
+        24,
+        RED,
+        True
     )
 
 
-    story.append(
-        Paragraph(
-            """
-            <b>CardioCare</b><br/>
-            <font size='11' color='#566573'>
-            AI Powered Heart Risk Assessment Report
-            </font>
-            """,
-            title_style
-        )
+    text(
+        c,
+        "AI Powered Heart Risk Assessment",
+        48,
+        height-82,
+        11,
+        GREY
     )
 
 
-    story.append(
-        Paragraph(
-            f"""
-            <para align='center'>
-            Generated: 
-            {report.get(
-                "date",
-                datetime.now().strftime("%d-%m-%Y %H:%M")
-            )}
-            </para>
-            """,
-            styles["Normal"]
-        )
+    # badge
+
+    c.setFillColor(RED)
+
+    c.roundRect(
+        330,
+        height-70,
+        160,
+        25,
+        6,
+        fill=1,
+        stroke=0
+    )
+
+    center(
+        c,
+        "AI GENERATED REPORT",
+        410,
+        height-62,
+        9,
+        colors.white
     )
 
 
-    story.append(Spacer(1,0.4*cm))
 
+    # =====================
+    # PATIENT CARD
+    # =====================
 
-
-    # ===============================
-    # AI BADGE
-    # ===============================
-
-
-    badge = Table(
-        [["AI GENERATED REPORT"]],
-        colWidths=[5*cm]
+    card(
+        c,
+        40,
+        height-165,
+        515,
+        65
     )
 
 
-    badge.setStyle(TableStyle([
-
-        ("BACKGROUND",(0,0),(-1,-1),PRIMARY_RED),
-
-        ("TEXTCOLOR",(0,0),(-1,-1),WHITE),
-
-        ("ALIGN",(0,0),(-1,-1),"CENTER"),
-
-        ("FONTNAME",(0,0),(-1,-1),"Helvetica-Bold"),
-
-        ("PADDING",(0,0),(-1,-1),8),
-
-    ]))
+    text(
+        c,
+        "Patient ID:",
+        70,
+        height-125,
+        9,
+        DARK,
+        True
+    )
 
 
-    story.append(badge)
+    text(
+        c,
+        "CC-2026-001",
+        150,
+        height-125
+    )
 
-    story.append(Spacer(1,0.5*cm))
+
+    text(
+        c,
+        "Report Generated:",
+        330,
+        height-125,
+        9,
+        DARK,
+        True
+    )
+
+
+    text(
+        c,
+        report.get(
+            "date",
+            datetime.now().strftime("%d-%m-%Y")
+        ),
+        440,
+        height-125
+    )
+
+
+    text(
+        c,
+        "Model:",
+        70,
+        height-148,
+        9,
+        DARK,
+        True
+    )
+
+
+    text(
+        c,
+        "CardioCare ML v1.0",
+        150,
+        height-148
+    )
 
 
 
+    # =====================
+    # RISK OVERVIEW
+    # =====================
 
 
-    # ===============================
-    # RISK SUMMARY CARDS
-    # ===============================
+    center(
+        c,
+        "RISK OVERVIEW",
+        width/2,
+        height-200,
+        13
+    )
+
 
 
     risk = report.get(
@@ -185,262 +252,215 @@ def create_pdf(report: dict, output_path: str):
         "Unknown"
     )
 
-
     score = report.get(
         "score",
         0
     )
 
 
-    rc = risk_color(risk)
+    # CARD 1
+
+    card(
+        c,
+        40,
+        height-310,
+        155,
+        85
+    )
+
+    center(
+        c,
+        "RISK LEVEL",
+        117,
+        height-250,
+        9,
+        GREEN
+    )
+
+    center(
+        c,
+        risk.upper(),
+        117,
+        height-285,
+        18,
+        GREEN
+    )
 
 
+    # CARD 2
 
-    risk_cards = Table(
+    card(
+        c,
+        220,
+        height-310,
+        155,
+        85
+    )
 
-        [
-
-            [
-
-                Paragraph(
-                    f"""
-                    <b>Risk Category</b>
-                    <br/><br/>
-
-                    <font size='18'
-                    color='{rc.hexval()}'>
-                    {risk}
-                    </font>
-                    """,
-
-                    styles["Normal"]
-
-                ),
+    center(
+        c,
+        "AI RISK SCORE",
+        297,
+        height-250,
+        9,
+        BLUE
+    )
 
 
-
-                Paragraph(
-
-                    f"""
-                    <b>AI Risk Probability</b>
-                    <br/><br/>
-
-                    <font size='18'>
-                    {score:.1f} %
-                    </font>
-
-                    """,
-
-                    styles["Normal"]
-
-                )
-
-            ]
-
-        ],
+    center(
+        c,
+        f"{score:.1f}%",
+        297,
+        height-285,
+        22,
+        BLUE
+    )
 
 
-        colWidths=[8*cm,8*cm]
+    # CARD 3
 
+    card(
+        c,
+        400,
+        height-310,
+        155,
+        85
+    )
+
+    center(
+        c,
+        "CONFIDENCE",
+        477,
+        height-250,
+        9,
+        PURPLE
+    )
+
+
+    center(
+        c,
+        "92%",
+        477,
+        height-285,
+        22,
+        PURPLE
     )
 
 
 
-    risk_cards.setStyle(TableStyle([
-
-        ("BACKGROUND",(0,0),(-1,-1),LIGHT_BG),
-
-        ("BOX",(0,0),(-1,-1),1,colors.lightgrey),
-
-        ("VALIGN",(0,0),(-1,-1),"MIDDLE"),
-
-        ("ALIGN",(0,0),(-1,-1),"CENTER"),
-
-        ("PADDING",(0,0),(-1,-1),18),
-
-    ]))
+    # =====================
+    # SUMMARY
+    # =====================
 
 
-
-    story.append(risk_cards)
-
-    story.append(Spacer(1,0.5*cm))
-
-
-
-
-
-    # ===============================
-    # AI SUMMARY
-    # ===============================
+    card(
+        c,
+        40,
+        height-430,
+        230,
+        90
+    )
 
 
-    section_style = ParagraphStyle(
+    text(
+        c,
+        "AI HEALTH SUMMARY",
+        60,
+        height-365,
+        12,
+        BLUE,
+        True
+    )
 
-        "section",
 
-        parent=styles["Heading2"],
-
-        fontSize=13,
-
-        textColor=PRIMARY_RED,
-
-        spaceBefore=10
-
+    text(
+        c,
+        report.get(
+            "message",
+            ""
+        )[:70],
+        60,
+        height-390
     )
 
 
 
-    normal = ParagraphStyle(
+    # CARE CARD
 
-        "normal",
 
-        parent=styles["Normal"],
+    card(
+        c,
+        290,
+        height-430,
+        265,
+        90
+    )
 
-        fontSize=10,
 
-        textColor=DARK_TEXT,
+    text(
+        c,
+        "RECOMMENDED CARE",
+        310,
+        height-365,
+        12,
+        BLUE,
+        True
+    )
 
-        leading=15
 
+    y = height-390
+
+    for item in report.get("care",[])[:4]:
+
+        text(
+            c,
+            "✓ "+item,
+            310,
+            y
+        )
+
+        y-=15
+
+
+
+    # =====================
+    # PARAMETERS
+    # =====================
+
+
+    card(
+        c,
+        40,
+        95,
+        515,
+        260
+    )
+
+
+    text(
+        c,
+        "PATIENT INPUT PARAMETERS",
+        60,
+        330,
+        12,
+        BLUE,
+        True
     )
 
 
 
-    def section(name):
-
-        story.append(
-            Paragraph(
-                name,
-                section_style
-            )
-        )
-
-        story.append(
-
-            HRFlowable(
-                width="100%",
-                thickness=0.5,
-                color=colors.lightgrey
-            )
-
-        )
-
-        story.append(
-            Spacer(1,0.15*cm)
-        )
-
-
-
-    section("AI Health Summary")
-
-
-    story.append(
-
-        Paragraph(
-
-            report.get(
-                "message",
-                "No summary available"
-            ),
-
-            normal
-
-        )
-
-    )
-
-
-
-
-
-
-    # ===============================
-    # SYMPTOMS
-    # ===============================
-
-
-    section("Health Indicators")
-
-
-    for item in report.get(
-        "symptoms",
-        []
-    ):
-
-        story.append(
-
-            Paragraph(
-                f"✓ {item}",
-                normal
-            )
-
-        )
-
-
-
-
-    # ===============================
-    # CARE
-    # ===============================
-
-
-    section(
-        "Recommended Care Plan"
-    )
-
-
-    for item in report.get(
-        "care",
-        []
-    ):
-
-
-        story.append(
-
-            Paragraph(
-
-                f"✓ {item}",
-
-                normal
-
-            )
-
-        )
-
-
-
-
-
-    # ===============================
-    # PATIENT DATA
-    # ===============================
-
-
-    section(
-        "Patient Input Parameters"
-    )
-
-
-
-    labels = [
+    labels=[
 
         "Age",
-        "Sex (1=M / 0=F)",
-        "Chest Pain Type",
-        "Resting BP",
+        "Sex",
+        "Chest Pain",
+        "BP",
         "Cholesterol",
-        "Fasting Blood Sugar",
-        "Resting ECG",
         "Max Heart Rate",
-        "Exercise Angina",
         "ST Depression",
-        "Slope",
-        "Major Vessels",
         "Thalassemia"
 
     ]
-
 
 
     values = report.get(
@@ -449,135 +469,58 @@ def create_pdf(report: dict, output_path: str):
     )
 
 
-
-    data = [
-
-        [
-            "Parameter",
-            "Value"
-        ]
-
-    ]
-
-
+    y=300
 
     for a,b in zip(labels,values):
 
-        data.append(
-
-            [
-                a,
-                str(b)
-            ]
-
+        text(
+            c,
+            a,
+            70,
+            y,
+            9
         )
 
-
-
-
-    table = Table(
-
-        data,
-
-        colWidths=[10*cm,6*cm]
-
-    )
-
-
-
-    table.setStyle(TableStyle([
-
-
-        ("BACKGROUND",(0,0),(-1,0),PRIMARY_RED),
-
-        ("TEXTCOLOR",(0,0),(-1,0),WHITE),
-
-        ("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
-
-
-        ("BACKGROUND",(0,1),(-1,-1),WHITE),
-
-
-        ("LINEBELOW",(0,0),(-1,-1),
-         0.4,
-         colors.lightgrey),
-
-
-        ("ALIGN",(1,0),(1,-1),"CENTER"),
-
-
-        ("PADDING",(0,0),(-1,-1),8),
-
-        ("FONTSIZE",(0,0),(-1,-1),9)
-
-
-    ]))
-
-
-
-    story.append(table)
-
-
-
-    story.append(
-        Spacer(1,0.6*cm)
-    )
-
-
-
-
-
-    # ===============================
-    # DISCLAIMER
-    # ===============================
-
-
-    story.append(
-
-        HRFlowable(
-            width="100%",
-            thickness=0.5,
-            color=colors.lightgrey
+        text(
+            c,
+            b,
+            250,
+            y,
+            9,
+            DARK,
+            True
         )
 
+        y-=22
+
+
+
+    # =====================
+    # FOOTER
+    # =====================
+
+
+    c.setFillColor(LIGHT)
+
+    c.roundRect(
+        40,
+        35,
+        515,
+        35,
+        10,
+        fill=1,
+        stroke=0
     )
 
 
-
-    disclaimer = ParagraphStyle(
-
-        "disc",
-
-        parent=styles["Normal"],
-
-        fontSize=8,
-
-        textColor=colors.grey,
-
-        alignment=TA_CENTER,
-
-        leading=12
-
+    text(
+        c,
+        "Disclaimer: AI generated report. Not a substitute for professional medical advice.",
+        60,
+        50,
+        8,
+        GREY
     )
 
 
-
-    story.append(
-
-        Paragraph(
-
-            """
-            This report was generated using an AI prediction model.
-            It is for informational purposes only and should not replace
-            professional medical diagnosis or treatment.
-            """,
-
-            disclaimer
-
-        )
-
-    )
-
-
-
-    doc.build(story)
+    c.save()
