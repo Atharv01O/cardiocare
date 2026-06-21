@@ -1,3 +1,4 @@
+{% import "icons.html" as icons %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,10 +11,8 @@
 </head>
 <body>
 
-  <!-- ── Sidebar Overlay (mobile) ── -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-  <!-- ── Sidebar ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <span class="brand-icon">❤️</span>
@@ -22,47 +21,43 @@
 
     <nav class="sidebar-nav">
       <a href="{{ url_for('dashboard') }}"    class="nav-link {% if request.endpoint=='dashboard'    %}active{% endif %}">
-        <span class="nav-icon">📊</span> Dashboard
+        {{ icons.icon('dashboard', 17, 'nav-icon') }} Dashboard
       </a>
       <a href="{{ url_for('predict') }}"      class="nav-link {% if request.endpoint=='predict'      %}active{% endif %}">
-        <span class="nav-icon">🔍</span> Predict Risk
+        {{ icons.icon('search', 17, 'nav-icon') }} Predict Risk
       </a>
       <a href="{{ url_for('blood_report') }}" class="nav-link {% if request.endpoint=='blood_report' %}active{% endif %}">
-        <span class="nav-icon">🩸</span> Blood Report
+        {{ icons.icon('droplet', 17, 'nav-icon') }} Blood Report
       </a>
       <a href="{{ url_for('history') }}"      class="nav-link {% if request.endpoint=='history'      %}active{% endif %}">
-        <span class="nav-icon">📋</span> History
+        {{ icons.icon('history', 17, 'nav-icon') }} History
       </a>
       <a href="{{ url_for('compare') }}"      class="nav-link {% if request.endpoint=='compare'      %}active{% endif %}">
-        <span class="nav-icon">🔄</span> Compare
+        {{ icons.icon('compare', 17, 'nav-icon') }} Compare
       </a>
       <a href="{{ url_for('model_info') }}"   class="nav-link {% if request.endpoint=='model_info'   %}active{% endif %}">
-        <span class="nav-icon">🧠</span> AI Model
+        {{ icons.icon('brain', 17, 'nav-icon') }} AI Model
       </a>
     </nav>
 
-    <div class="sidebar-footer">
-      <span>CardioCare v1.0</span>
-    </div>
+    <div class="sidebar-footer">CardioCare v1.0</div>
   </aside>
 
-  <!-- ── Main ── -->
   <main class="main-content">
     <header class="topbar">
       <div style="display:flex;align-items:center;gap:6px">
-        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <button class="menu-toggle" onclick="toggleSidebar()">{{ icons.icon('menu', 20) }}</button>
         <div class="topbar-title">{% block page_title %}{% endblock %}</div>
       </div>
       <div class="topbar-right">
         <span class="status-dot"></span>
         <span class="status-text">AI Model Active</span>
 
-        <!-- Profile dropdown -->
         <div class="profile-menu">
           <div class="profile-btn" onclick="toggleProfileMenu()">
             <div class="profile-avatar">{{ current_user.name[0].upper() }}</div>
             <span class="profile-name">{{ current_user.name }}</span>
-            <span class="profile-caret">▾</span>
+            <span class="profile-caret">{{ icons.icon('chevron-down', 13) }}</span>
           </div>
           <div class="profile-dropdown" id="profileDropdown">
             <div class="pd-info">
@@ -70,7 +65,7 @@
               <div class="pd-email">{{ current_user.email }}</div>
             </div>
             <div class="pd-divider"></div>
-            <a href="{{ url_for('logout') }}" class="pd-item logout">🚪 Sign Out</a>
+            <a href="{{ url_for('logout') }}" class="pd-item logout">{{ icons.icon('logout', 15) }} Sign Out</a>
           </div>
         </div>
       </div>
@@ -81,25 +76,24 @@
     </div>
   </main>
 
-  <!-- ── Gemini Floating Chat ── -->
   <div class="chat-bubble" id="chatBubble" onclick="toggleChat()" title="Ask CardioCare Assistant">
-    💬
+    {{ icons.icon('sparkles', 22) }}
     <span class="chat-unread" id="chatUnread" style="display:none">1</span>
   </div>
 
   <div class="chat-panel" id="chatPanel">
     <div class="chat-header">
       <div class="chat-header-info">
-        <span class="chat-avatar">✨</span>
+        <span class="chat-avatar">{{ icons.icon('sparkles', 18) }}</span>
         <div>
           <div class="chat-title">CardioCare Assistant</div>
           <div class="chat-subtitle">Powered by Gemini AI</div>
         </div>
       </div>
-      <button class="chat-close" onclick="toggleChat()">✕</button>
+      <button class="chat-close" onclick="toggleChat()">{{ icons.icon('x', 16) }}</button>
     </div>
     <div class="chat-context-badge" id="chatContextBadge" style="display:none">
-      📋 Aware of your latest report
+      {{ icons.icon('clipboard', 13) }} Aware of your latest report
     </div>
     <div class="chat-messages" id="chatMessages">
       <div class="chat-msg assistant">
@@ -108,7 +102,7 @@
     </div>
     <div class="chat-input-row">
       <input type="text" id="chatInput" class="chat-input" placeholder="Ask about your results..." onkeydown="if(event.key==='Enter')sendMessage()"/>
-      <button class="chat-send" onclick="sendMessage()">➤</button>
+      <button class="chat-send" onclick="sendMessage()">{{ icons.icon('send', 15) }}</button>
     </div>
   </div>
 

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "icons.html" as icons %}
 {% block title %}— Dashboard{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
@@ -11,28 +12,28 @@
 <!-- ── Stat Cards ── -->
 <div class="stat-grid">
   <div class="stat-card">
-    <div class="stat-icon blue">📋</div>
+    <div class="stat-icon blue">{{ icons.icon('clipboard', 21) }}</div>
     <div class="stat-info">
       <div class="stat-value count-up" data-target="{{ total }}">0</div>
       <div class="stat-label">Total Assessments</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon green">✅</div>
+    <div class="stat-icon green">{{ icons.icon('check-circle', 21) }}</div>
     <div class="stat-info">
       <div class="stat-value count-up" data-target="{{ low }}">0</div>
       <div class="stat-label">Low Risk</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon orange">⚠️</div>
+    <div class="stat-icon orange">{{ icons.icon('alert-triangle', 21) }}</div>
     <div class="stat-info">
       <div class="stat-value count-up" data-target="{{ moderate }}">0</div>
       <div class="stat-label">Moderate Risk</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon red">🚨</div>
+    <div class="stat-icon red">{{ icons.icon('alert-octagon', 21) }}</div>
     <div class="stat-info">
       <div class="stat-value count-up" data-target="{{ high }}">0</div>
       <div class="stat-label">High Risk</div>
@@ -40,11 +41,11 @@
   </div>
 </div>
 
-<!-- ── Your Predictions Charts ── -->
+<!-- ── Your Predictions ── -->
 <div class="section-header">
-  <h2 class="section-title">📊 Your Predictions</h2>
+  <h2 class="section-title">{{ icons.icon('bar-chart', 16) }} Your Predictions</h2>
 </div>
-<div class="charts-grid" style="margin-bottom:28px">
+<div class="charts-grid" style="margin-bottom:32px">
   <div class="chart-card">
     <h3 class="chart-title">Risk Distribution</h3>
     <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
@@ -57,107 +58,93 @@
 
 <!-- ── WHO World Data Section ── -->
 <div class="section-header">
-  <h2 class="section-title">🌍 Global Heart Disease Conditions</h2>
-  <div class="who-badge" id="whoBadge">
-    <span class="who-dot"></span> Loading WHO data…
-  </div>
+  <h2 class="section-title">{{ icons.icon('globe', 16) }} Global Heart Disease Conditions</h2>
+  <div class="who-badge" id="whoBadge"><span class="who-dot"></span> Loading WHO data…</div>
 </div>
 
 <div class="charts-grid who-section">
-
-  <!-- Regional Bar -->
   <div class="chart-card wide">
     <h3 class="chart-title">CVD Mortality Rate by WHO Region <span class="chart-unit">(NCD mortality probability %, age 30–70)</span></h3>
     <div class="chart-wrap tall"><canvas id="regionalBar"></canvas></div>
   </div>
-
-  <!-- Global Trend -->
   <div class="chart-card">
     <h3 class="chart-title">Global CVD Mortality Trend <span class="chart-unit">(rate declining due to better treatment)</span></h3>
     <div class="chart-wrap"><canvas id="trendLine"></canvas></div>
-    <div class="trend-note">📉 The <em>death rate per 100k</em> is falling — but total deaths are rising as population ages. Progress is real but the burden remains high.</div>
+    <div class="trend-note">{{ icons.icon('trending-down', 13) }} The <em>death rate per 100k</em> is falling — but total deaths are rising as population ages.</div>
   </div>
-
-  <!-- Top Countries -->
   <div class="chart-card">
     <h3 class="chart-title">Highest Risk Countries <span class="chart-unit">(NCD mortality %)</span></h3>
     <div class="chart-wrap"><canvas id="topCountries"></canvas></div>
   </div>
+</div>
 
+<div class="who-credit" id="whoCredit" style="display:none">
+  {{ icons.icon('activity', 13) }} Data source: <strong id="whoSource"></strong> · Last fetched: <span id="whoFetched"></span>
 </div>
 
 <!-- ── India Section ── -->
-<div class="section-header" style="margin-top:8px">
-  <h2 class="section-title">🇮🇳 India — Heart Disease Conditions</h2>
+<div class="section-header">
+  <h2 class="section-title">{{ icons.icon('india', 16) }} India — Heart Disease Conditions</h2>
   <div class="who-badge" id="indiaBadge"><span class="who-dot"></span> Loading...</div>
 </div>
 
 <div class="india-grid">
-
   <div class="india-stat-card">
-    <div class="india-stat-icon">📊</div>
+    <div class="india-stat-icon">{{ icons.icon('bar-chart', 19) }}</div>
     <div class="india-stat-info">
       <div class="india-stat-value" id="indiaRate">—</div>
       <div class="india-stat-label">NCD Mortality Probability (%)</div>
       <div class="india-stat-sub" id="indiaYear">age 30–70, both sexes</div>
     </div>
   </div>
-
   <div class="india-stat-card warn">
-    <div class="india-stat-icon">⚠️</div>
+    <div class="india-stat-icon">{{ icons.icon('users', 19) }}</div>
     <div class="india-stat-info">
       <div class="india-stat-value">~63M</div>
       <div class="india-stat-label">People living with CVD in India</div>
       <div class="india-stat-sub">WHO Global Health Estimates 2023</div>
     </div>
   </div>
-
   <div class="india-stat-card red">
-    <div class="india-stat-icon">💔</div>
+    <div class="india-stat-icon">{{ icons.icon('heart-pulse', 19) }}</div>
     <div class="india-stat-info">
       <div class="india-stat-value">~2.8M</div>
       <div class="india-stat-label">CVD deaths per year in India</div>
       <div class="india-stat-sub">#1 cause of death nationally</div>
     </div>
   </div>
-
   <div class="india-stat-card blue">
-    <div class="india-stat-icon">📉</div>
+    <div class="india-stat-icon">{{ icons.icon('clock', 19) }}</div>
     <div class="india-stat-info">
       <div class="india-stat-value">10–15 yrs</div>
       <div class="india-stat-label">Earlier onset vs Western nations</div>
       <div class="india-stat-sub">Urban Indians at higher risk earlier</div>
     </div>
   </div>
-
 </div>
 
 <div class="charts-grid" style="margin-bottom:8px">
   <div class="chart-card">
-    <h3 class="chart-title">🇮🇳 India CVD Mortality Trend</h3>
+    <h3 class="chart-title">India CVD Mortality Trend</h3>
     <div class="chart-wrap"><canvas id="indiaTrend"></canvas></div>
   </div>
-
   <div class="chart-card">
-    <h3 class="chart-title">🇮🇳 Key Risk Factors in India</h3>
+    <h3 class="chart-title">Key Risk Factors in India</h3>
     <div class="chart-wrap"><canvas id="indiaRiskFactors"></canvas></div>
   </div>
 </div>
 
 <div class="india-context-card" id="indiaContext">
-  <div class="ic-icon">🏥</div>
+  <div class="ic-icon">{{ icons.icon('stethoscope', 18) }}</div>
   <div class="ic-text" id="indiaContextText">Loading India-specific context...</div>
-</div>
-
-<!-- ── Data source credit ── -->
-<div class="who-credit" id="whoCredit" style="display:none">
-  📡 Data source: <strong id="whoSource"></strong> · Last fetched: <span id="whoFetched"></span>
 </div>
 
 <!-- ── Recent Reports Table ── -->
 {% if reports %}
+<div class="section-header">
+  <h2 class="section-title">{{ icons.icon('history', 16) }} Recent Assessments</h2>
+</div>
 <div class="table-card">
-  <h3 class="chart-title">Recent Assessments</h3>
   <table class="report-table">
     <thead>
       <tr><th>#</th><th>Date</th><th>Score</th><th>Risk Level</th><th>Action</th></tr>
@@ -168,19 +155,17 @@
         <td>{{ loop.index }}</td>
         <td>{{ r.date }}</td>
         <td><span class="score-badge">{{ r.score }}%</span></td>
-        <td>
-          <span class="risk-badge {{ r.risk | lower | replace(' ','') }}">{{ r.risk }}</span>
-        </td>
-        <td><a href="{{ url_for('download', filename=r.pdf) }}" class="btn-small">⬇ PDF</a></td>
+        <td><span class="risk-badge {{ r.risk | lower | replace(' ','') }}">{{ r.risk }}</span></td>
+        <td><a href="{{ url_for('download', filename=r.pdf) }}" class="btn-small">{{ icons.icon('download', 12) }} PDF</a></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <a href="{{ url_for('history') }}" class="view-all">View all reports →</a>
+  <a href="{{ url_for('history') }}" class="view-all">View all reports {{ icons.icon('arrow-right', 13) }}</a>
 </div>
 {% else %}
 <div class="empty-state">
-  <div class="empty-icon">🫀</div>
+  <div class="empty-icon">{{ icons.icon('heart-pulse', 40) }}</div>
   <p>No assessments yet. <a href="{{ url_for('predict') }}">Run your first prediction</a>.</p>
 </div>
 {% endif %}

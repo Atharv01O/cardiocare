@@ -1,41 +1,47 @@
 // dashboard.js — Your prediction charts + live WHO GHO data charts
 
+const EMPTY_ICON_CHART = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>';
+
 document.addEventListener("DOMContentLoaded", () => {
-  Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
-  Chart.defaults.color       = "#64748b";
+  Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+  Chart.defaults.color       = "#767b8a";
 
   // ── 1. Your predictions: Donut ──────────────────────────────
   const donutCtx = document.getElementById("donutChart");
-  if (donutCtx) {
+  if (donutCtx && (LOW + MODERATE + HIGH) === 0) {
+    donutCtx.parentElement.innerHTML = `<div class="empty-chart">${EMPTY_ICON_CHART}<div>No predictions yet<br><a href="/predict">Run your first assessment</a></div></div>`;
+  } else if (donutCtx) {
     new Chart(donutCtx, {
       type: "doughnut",
       data: {
         labels: ["Low Risk", "Moderate Risk", "High Risk"],
-        datasets: [{ data:[LOW,MODERATE,HIGH], backgroundColor:["#16a34a","#ea580c","#dc2626"], borderWidth:2, borderColor:"#fff", hoverOffset:6 }]
+        datasets: [{ data:[LOW,MODERATE,HIGH], backgroundColor:["#1a9e5c","#d97a1f","#d62839"], borderWidth:2, borderColor:"#fff", hoverOffset:6 }]
       },
-      options: { responsive:true, maintainAspectRatio:false, cutout:"65%", plugins:{ legend:{ position:"bottom", labels:{padding:16,font:{size:12}} } } }
+      options: { responsive:true, maintainAspectRatio:false, cutout:"68%", plugins:{ legend:{ position:"bottom", labels:{padding:16,font:{size:12},usePointStyle:true,pointStyle:"circle"} } } }
     });
   }
 
   // ── 2. Your predictions: Trend ──────────────────────────────
   const trendCtx = document.getElementById("trendChart");
-  if (trendCtx) {
+  if (trendCtx && SCORES.length === 0) {
+    trendCtx.parentElement.innerHTML = `<div class="empty-chart">${EMPTY_ICON_CHART}<div>No trend data yet<br><a href="/predict">Run your first assessment</a></div></div>`;
+  } else if (trendCtx) {
     new Chart(trendCtx, {
       type: "line",
       data: {
         labels: SCORES.map((_,i) => "#"+(i+1)),
-        datasets:[{ label:"Risk Score (%)", data:SCORES, borderColor:"#e63946", backgroundColor:"rgba(230,57,70,0.08)", tension:0.4, fill:true, pointBackgroundColor:"#e63946", pointRadius:4 }]
+        datasets:[{ label:"Risk Score (%)", data:SCORES, borderColor:"#d62839", backgroundColor:"rgba(214,40,57,0.07)", tension:0.4, fill:true, pointBackgroundColor:"#d62839", pointRadius:4, borderWidth:2.5 }]
       },
-      options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{min:0,max:100,grid:{color:"#f1f5f9"}}, x:{grid:{display:false}} }, plugins:{legend:{display:false}} }
+      options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{min:0,max:100,grid:{color:"#f0eee8"}}, x:{grid:{display:false}} }, plugins:{legend:{display:false}} }
     });
   }
 
   // ── Stagger card animations ──────────────────────────────────
   document.querySelectorAll(".stat-card,.chart-card,.table-card").forEach((el,i) => {
-    el.style.animationDelay = (i*60)+"ms";
+    el.style.animationDelay = (i*55)+"ms";
   });
 
-  // ── 3-5. WHO Live Data ───────────────────────────────────────
+  // ── WHO Live Data ───────────────────────────────────────────
   loadWHOData();
 });
 
@@ -48,22 +54,20 @@ async function loadWHOData() {
     const res  = await fetch("/api/who-data");
     const data = await res.json();
 
-    // Update badge
-    badge.innerHTML = '<span class="who-dot live"></span> Live WHO GHO Data';
+    badge.innerHTML = `<span class="who-dot live"></span> Live WHO GHO Data`;
     badge.classList.add("live");
 
-    // Show credit
     if (credit) {
       document.getElementById("whoSource").textContent  = data.source || "WHO GHO";
       document.getElementById("whoFetched").textContent = data.fetched_at || "";
-      credit.style.display = "block";
+      credit.style.display = "flex";
     }
 
-    // ── 3. Regional Bar ────────────────────────────────────────
+    // Regional Bar
     const regionalCtx = document.getElementById("regionalBar");
     if (regionalCtx && data.regional) {
       const sorted  = [...data.regional].sort((a,b) => b.rate - a.rate);
-      const palette = ["#dc2626","#ea580c","#f59e0b","#16a34a","#2563eb","#7c3aed"];
+      const palette = ["#d62839","#d97a1f","#e0a83e","#1a9e5c","#3d6b8c","#7c5cbf"];
       new Chart(regionalCtx, {
         type: "bar",
         data: {
@@ -73,46 +77,20 @@ async function loadWHOData() {
             data:  sorted.map(d => d.rate),
             backgroundColor: sorted.map((_,i) => palette[i % palette.length] + "cc"),
             borderColor:     sorted.map((_,i) => palette[i % palette.length]),
-            borderWidth: 1.5,
-            borderRadius: 6,
+            borderWidth: 1.5, borderRadius: 6,
           }]
         },
         options: {
           responsive:true, maintainAspectRatio:false,
-          scales:{ y:{grid:{color:"#f1f5f9"},ticks:{callback:v=>v+"%"}}, x:{grid:{display:false}} },
+          scales:{ y:{grid:{color:"#f0eee8"},ticks:{callback:v=>v+"%"}}, x:{grid:{display:false}} },
           plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>` ${ctx.parsed.y}% probability` } } }
         }
       });
     }
 
-    // ── 4. Global Trend Line ───────────────────────────────────
-    const trendLineCtx = document.getElementById("trendLine");
-    if (trendLineCtx && data.trend) {
-      new Chart(trendLineCtx, {
-        type: "line",
-        data: {
-          labels: data.trend.map(d => d.year),
-          datasets:[{
-            label: "CVD Death Rate",
-            data:  data.trend.map(d => d.rate),
-            borderColor: "#2563eb",
-            backgroundColor: "rgba(37,99,235,0.07)",
-            tension: 0.4, fill: true,
-            pointBackgroundColor: "#2563eb", pointRadius: 4,
-          }]
-        },
-        options:{
-          responsive:true, maintainAspectRatio:false,
-          scales:{ y:{ grid:{color:"#f1f5f9"}, ticks:{callback:v=>v+"%"} }, x:{grid:{display:false}} },
-          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>` ${ctx.parsed.y}% mortality` } } }
-        }
-      });
-    }
-
-    // ── India Charts ───────────────────────────────────────────
     if (data.india) renderIndiaCharts(data.india);
 
-    // ── 5. Top Countries Horizontal Bar ───────────────────────
+    // Top Countries
     const topCtx = document.getElementById("topCountries");
     if (topCtx && data.top_countries) {
       const sorted2 = [...data.top_countries].sort((a,b) => b.rate - a.rate);
@@ -120,48 +98,46 @@ async function loadWHOData() {
         type: "bar",
         data: {
           labels:   sorted2.map(d => d.country),
-          datasets: [{
-            label: "NCD Mortality %",
-            data:  sorted2.map(d => d.rate),
-            backgroundColor: "rgba(220,38,38,0.75)",
-            borderColor: "#dc2626",
-            borderWidth: 1,
-            borderRadius: 4,
-          }]
+          datasets: [{ label: "NCD Mortality %", data: sorted2.map(d => d.rate), backgroundColor: "rgba(214,40,57,0.75)", borderColor: "#d62839", borderWidth: 1, borderRadius: 4 }]
         },
         options:{
-          indexAxis: "y",
-          responsive:true, maintainAspectRatio:false,
-          scales:{
-            x:{ grid:{color:"#f1f5f9"}, ticks:{callback:v=>v+"%"} },
-            y:{ grid:{display:false}, ticks:{font:{size:11}} }
-          },
+          indexAxis: "y", responsive:true, maintainAspectRatio:false,
+          scales:{ x:{ grid:{color:"#f0eee8"}, ticks:{callback:v=>v+"%"} }, y:{ grid:{display:false}, ticks:{font:{size:11}} } },
           plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>` ${ctx.parsed.x}%` } } }
+        }
+      });
+    }
+
+    // Global Trend Line
+    const trendLineCtx = document.getElementById("trendLine");
+    if (trendLineCtx && data.trend) {
+      new Chart(trendLineCtx, {
+        type: "line",
+        data: {
+          labels: data.trend.map(d => d.year),
+          datasets:[{ label: "CVD Death Rate", data: data.trend.map(d => d.rate), borderColor: "#3d6b8c", backgroundColor: "rgba(61,107,140,0.07)", tension: 0.4, fill: true, pointBackgroundColor: "#3d6b8c", pointRadius: 4, borderWidth: 2.5 }]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          scales:{ y:{ grid:{color:"#f0eee8"}, ticks:{callback:v=>v+"%"} }, x:{grid:{display:false}} },
+          plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>` ${ctx.parsed.y}% mortality` } } }
         }
       });
     }
 
   } catch (err) {
     console.error("WHO data fetch failed:", err);
-    badge.innerHTML = '<span class="who-dot error"></span> WHO data unavailable (offline fallback shown)';
+    badge.innerHTML = `<span class="who-dot error"></span> WHO data unavailable`;
     badge.classList.add("error");
-    // Charts will still render using fallback data from the Flask route
-    loadWHOData_fallback();
+    ["regionalBar","trendLine","topCountries"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.parentElement.innerHTML = `<div class="empty-chart">${EMPTY_ICON_CHART}<div>WHO data unavailable — check connection</div></div>`;
+    });
   }
 }
 
-async function loadWHOData_fallback() {
-  // If fetch itself failed (e.g. Flask not running), show empty state gracefully
-  ["regionalBar","trendLine","topCountries"].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const parent = el.parentElement;
-    parent.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:0.85rem;">WHO data unavailable — check your connection</div>';
-  });
-}
-
 function renderIndiaCharts(india) {
-  // Update stat cards
   const rateEl = document.getElementById("indiaRate");
   const yearEl = document.getElementById("indiaYear");
   const badge  = document.getElementById("indiaBadge");
@@ -169,67 +145,40 @@ function renderIndiaCharts(india) {
 
   if (rateEl) rateEl.textContent = india.latest_rate + "%";
   if (yearEl) yearEl.textContent = `age 30–70, both sexes (${india.latest_year})`;
-  if (badge)  {
-    badge.innerHTML = `<span class="who-dot live"></span> WHO GHO Data`;
-    badge.classList.add("live");
-  }
+  if (badge)  { badge.innerHTML = `<span class="who-dot live"></span> WHO GHO Data`; badge.classList.add("live"); }
   if (ctxTxt) ctxTxt.textContent = india.rank_context;
 
-  // India Trend Line
   const indiaTrendCtx = document.getElementById("indiaTrend");
   if (indiaTrendCtx && india.trend) {
     new Chart(indiaTrendCtx, {
       type: "line",
       data: {
         labels: india.trend.map(d => d.year),
-        datasets: [{
-          label: "India CVD Mortality %",
-          data:  india.trend.map(d => d.rate),
-          borderColor: "#f97316",
-          backgroundColor: "rgba(249,115,22,0.08)",
-          tension: 0.4, fill: true,
-          pointBackgroundColor: "#f97316", pointRadius: 5,
-        }]
+        datasets: [{ label: "India CVD Mortality %", data: india.trend.map(d => d.rate), borderColor: "#d97a1f", backgroundColor: "rgba(217,122,31,0.08)", tension: 0.4, fill: true, pointBackgroundColor: "#d97a1f", pointRadius: 5, borderWidth: 2.5 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        scales: {
-          y: { grid: { color: "#f1f5f9" }, ticks: { callback: v => v + "%" } },
-          x: { grid: { display: false } }
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}% mortality probability` } }
-        }
+        scales: { y: { grid: { color: "#f0eee8" }, ticks: { callback: v => v + "%" } }, x: { grid: { display: false } } },
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}% mortality probability` } } }
       }
     });
   }
 
-  // India Risk Factors horizontal bar
   const indiaRFCtx = document.getElementById("indiaRiskFactors");
   if (indiaRFCtx) {
     new Chart(indiaRFCtx, {
       type: "bar",
       data: {
-        labels: ["Hypertension", "Diabetes", "Tobacco Use", "Obesity", "Air Pollution", "Physical Inactivity", "High Cholesterol"],
+        labels: ["Hypertension", "Diabetes", "Tobacco Use", "Obesity", "Air Pollution", "Inactivity", "High Cholesterol"],
         datasets: [{
-          label: "Prevalence among CVD patients (%)",
-          data: [67, 42, 38, 31, 28, 55, 44],
-          backgroundColor: [
-            "rgba(220,38,38,0.75)", "rgba(234,88,12,0.75)", "rgba(161,98,7,0.75)",
-            "rgba(101,163,13,0.75)", "rgba(8,145,178,0.75)", "rgba(79,70,229,0.75)",
-            "rgba(168,85,247,0.75)"
-          ],
+          label: "Prevalence (%)", data: [67, 42, 38, 31, 28, 55, 44],
+          backgroundColor: ["rgba(214,38,57,0.75)","rgba(217,122,31,0.75)","rgba(184,134,11,0.75)","rgba(101,163,13,0.75)","rgba(8,145,178,0.75)","rgba(79,70,229,0.75)","rgba(168,85,247,0.75)"],
           borderRadius: 5,
         }]
       },
       options: {
-        indexAxis: "y",
-        responsive: true, maintainAspectRatio: false,
-        scales: {
-          x: { grid: { color: "#f1f5f9" }, ticks: { callback: v => v + "%" }, max: 100 },
-          y: { grid: { display: false }, ticks: { font: { size: 11 } } }
-        },
+        indexAxis: "y", responsive: true, maintainAspectRatio: false,
+        scales: { x: { grid: { color: "#f0eee8" }, ticks: { callback: v => v + "%" }, max: 100 }, y: { grid: { display: false }, ticks: { font: { size: 11 } } } },
         plugins: { legend: { display: false } }
       }
     });
