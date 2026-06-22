@@ -7,7 +7,11 @@ load_dotenv()
 # =========================
 
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH  = os.path.join(BASE_DIR, "model", "heart_model.keras")
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "model",
+    "heart_model.h5"
+)
 SCALER_PATH = os.path.join(BASE_DIR, "model", "scaler.pkl")
 DATASET_PATH= os.path.join(BASE_DIR, "dataset", "heart.csv")
 REPORTS_DIR = os.path.join(BASE_DIR, "reports")

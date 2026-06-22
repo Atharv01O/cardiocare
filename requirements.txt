@@ -3,7 +3,7 @@ Flask-Login==0.6.3
 gunicorn==26.0.0
 
 tensorflow==2.20.0
-keras==3.10.0
+
 
 numpy==2.2.6
 pandas==2.3.0
