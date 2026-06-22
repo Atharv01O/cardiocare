@@ -226,7 +226,7 @@ print(
 # SAVE
 # =========================
 
-model.save("model/heart_model.keras")
+model.export("model/heart_saved_model")
 
 
 joblib.dump(
