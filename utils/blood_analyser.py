@@ -109,7 +109,7 @@ def _extract_json_array(raw: str) -> str:
 
 def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
 
-    if not GEMINI_API_KEY or GEMINI_API_KEY == os.getenv("GEMINI_API_KEY"):
+    if not GEMINI_API_KEY:
         return {
             "error": "Gemini API key not configured.",
             "heart_relevant": [],
