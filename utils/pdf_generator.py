@@ -299,34 +299,57 @@ def create_pdf(report: dict, output_path: str, patient_name: str = "Patient") ->
         "Slope of ST", "Major Vessels (0-3)", "Thalassemia",
     ]
 
-    half = (len(labels) + 1) // 2
-    left_labels,  left_vals  = labels[:half], values[:half]
-    right_labels, right_vals = labels[half:], values[half:]
+    half = 7  # left=7 rows, right=6 rows, pad right to 7
+    left_labels = labels[:half]
+    left_vals   = [str(v) for v in values[:half]]
+    right_labels = labels[half:] + [""]          # pad to 7
+    right_vals   = [str(v) for v in values[half:]] + [""]  # pad to 7
 
-    th_style = ParagraphStyle("th", fontSize=8.5, fontName="Helvetica-Bold", textColor=WHITE)
-    td_style = ParagraphStyle("td", fontSize=8.5, textColor=TEXT_GRAY)
+    th  = ParagraphStyle("th",  fontSize=8.5, fontName="Helvetica-Bold", textColor=WHITE, leading=12)
+    td  = ParagraphStyle("td",  fontSize=8.5, textColor=TEXT_GRAY, leading=12)
+    tdg = ParagraphStyle("tdg", fontSize=8.5, textColor=TEXT_GRAY, leading=12)
 
-    def _param_table(labs, vals):
-        rows = [[Paragraph("Parameter", th_style), Paragraph("Value", th_style)]]
-        for l, v in zip(labs, vals):
-            rows.append([Paragraph(l, td_style), Paragraph(str(v), td_style)])
-        t = Table(rows, colWidths=[5.0*cm, 3.1*cm])
-        t.setStyle(TableStyle([
-            ("BACKGROUND", (0,0), (-1,0), NAVY),
-            ("ROWBACKGROUNDS", (0,1), (-1,-1), [WHITE, LIGHT_GRAY]),
-            ("GRID", (0,0), (-1,-1), 0.4, MID_GRAY),
-            ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
-            ("TOPPADDING", (0,0), (-1,-1), 4.5),
-            ("BOTTOMPADDING", (0,0), (-1,-1), 4.5),
-            ("LEFTPADDING", (0,0), (-1,-1), 8),
-        ]))
-        return t
+    # 5 columns: LParam | LVal | gap | RParam | RVal — ALL 8 rows built uniformly
+    # Header row and every data row have exactly 5 cells — no mismatch possible
+    def P(text, style): return Paragraph(text, style) if text else ""
 
-    param_tables = Table(
-        [[_param_table(left_labels, left_vals), "  ", _param_table(right_labels, right_vals)]],
-        colWidths=[8.1*cm, 0.4*cm, 8.1*cm]
-    )
-    story.append(param_tables)
+    tbl_rows = [
+        [P("Parameter",th), P("Value",th), "", P("Parameter",th), P("Value",th)]
+    ]
+    for i in range(7):
+        ll = left_labels[i]  if i < len(left_labels)  else ""
+        lv = left_vals[i]    if i < len(left_vals)    else ""
+        rl = right_labels[i] if i < len(right_labels) else ""
+        rv = right_vals[i]   if i < len(right_vals)   else ""
+        tbl_rows.append([P(ll,td), P(lv,tdg), "", P(rl,td), P(rv,tdg)])
+
+    # colWidths: LParam=4.5 LVal=2.6 gap=0.5 RParam=4.5 RVal=2.6 = 14.7cm (fits in 16.6 page width - margins)
+    param_table = Table(tbl_rows, colWidths=[4.5*cm, 2.6*cm, 0.5*cm, 4.5*cm, 2.6*cm])
+    param_table.setStyle(TableStyle([
+        # Header backgrounds
+        ("BACKGROUND", (0,0), (1,0), NAVY),
+        ("BACKGROUND", (3,0), (4,0), NAVY),
+        # Row backgrounds - left half
+        ("ROWBACKGROUNDS", (0,1), (1,-1), [WHITE, LIGHT_GRAY]),
+        # Row backgrounds - right half (only first 6 data rows, last is padding)
+        ("ROWBACKGROUNDS", (3,1), (4,7), [WHITE, LIGHT_GRAY]),
+        # Grid - left half
+        ("GRID", (0,0), (1,-1), 0.4, MID_GRAY),
+        # Grid - right half (only first 6 data rows)
+        ("GRID", (3,0), (4,7), 0.4, MID_GRAY),
+        # hide padding row on right (row 7, index 7 = last)
+        ("BACKGROUND", (3,7), (4,7), WHITE),
+        ("GRID", (3,7), (4,7), 0, WHITE),
+        # Consistent padding everywhere
+        ("VALIGN",       (0,0), (-1,-1), "MIDDLE"),
+        ("TOPPADDING",   (0,0), (-1,-1), 5),
+        ("BOTTOMPADDING",(0,0), (-1,-1), 5),
+        ("LEFTPADDING",  (0,0), (-1,-1), 8),
+        ("RIGHTPADDING", (0,0), (-1,-1), 8),
+        # Gap column - no background, no grid
+        ("BACKGROUND", (2,0), (2,-1), WHITE),
+    ]))
+    story.append(param_table)
     story.append(Spacer(1, 0.2*cm))
 
     # ════════════════════════════════════════
