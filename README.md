@@ -1,3 +1,12 @@
+---
+title: CardioCare
+emoji: ❤️
+colorFrom: red
+colorTo: pink
+sdk: docker
+app_port: 7860
+---
+
 # CardioCare — Heart Disease Prediction
 
 A Flask web app using a deep learning model to predict heart disease risk.
