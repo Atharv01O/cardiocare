@@ -8,7 +8,10 @@ import joblib
 from config import MODEL_PATH, SCALER_PATH
 
 # Load once at import time
-_model  = tf.keras.models.load_model(MODEL_PATH)
+_model = tf.keras.models.load_model(
+    MODEL_PATH,
+    compile=False
+)
 _scaler = joblib.load(SCALER_PATH)
 
 
