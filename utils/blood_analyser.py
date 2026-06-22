@@ -107,6 +107,8 @@ def _extract_json_array(raw: str) -> str:
     return raw[start : end_idx + 1]
 
 
+
+
 def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
 
     if not GEMINI_API_KEY:
@@ -115,7 +117,19 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
             "heart_relevant": [],
             "other": [],
         }
-
+# Resize large images to reduce payload size
+    if mime_type in ("image/jpeg", "image/png", "image/jpg"):
+        try:
+            from PIL import Image
+            import io
+            img = Image.open(io.BytesIO(file_bytes))
+            img.thumbnail((1200, 1600))  # max dimensions
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG", quality=85)
+            file_bytes = buf.getvalue()
+            mime_type = "image/jpeg"
+        except Exception:
+            pass  # use original if PIL fails
     url = (
         f"https://generativelanguage.googleapis.com/"
         f"v1beta/models/{GEMINI_MODEL}:generateContent"
@@ -144,7 +158,7 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
             data=payload,
             headers={"Content-Type": "application/json"},
         )
-        with urllib.request.urlopen(req, timeout=40) as resp:
+        with urllib.request.urlopen(req, timeout=90) as resp:
             data = json.loads(resp.read().decode("utf-8"))
 
         raw = data["candidates"][0]["content"]["parts"][0]["text"]
