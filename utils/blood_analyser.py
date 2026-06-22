@@ -6,75 +6,308 @@ Extracts heart-relevant values and flags abnormal ones.
 import json
 import base64
 import urllib.request
+import re
+
 from config import GEMINI_API_KEY, GEMINI_MODEL
 
-ANALYSIS_PROMPT = """You are a medical AI assistant. Analyse this blood test report and extract ALL test values present.
 
-For each value found, return a JSON array like this (respond ONLY with valid JSON, no markdown):
+ANALYSIS_PROMPT = """
+You are a medical AI assistant.
+
+Analyse this blood report image/pdf.
+
+Return ONLY valid JSON.
+No markdown.
+No explanation outside JSON.
+
+JSON format:
+
 [
-  {
-    "test": "Total Cholesterol",
-    "value": "240",
-    "unit": "mg/dL",
-    "normal_range": "< 200 mg/dL",
-    "status": "high",
-    "heart_relevant": true,
-    "explanation": "Your cholesterol is above the healthy limit. High cholesterol increases risk of arterial plaque and heart disease."
-  }
+ {
+  "test":"Total Cholesterol",
+  "value":"240",
+  "unit":"mg/dL",
+  "normal_range":"<200 mg/dL",
+  "status":"high",
+  "heart_relevant":true,
+  "explanation":"Short explanation"
+ }
 ]
 
-Status must be one of: "normal", "borderline", "high", "low", "critical"
-heart_relevant must be true for: cholesterol, triglycerides, blood sugar/glucose, HbA1c, blood pressure, CRP, homocysteine, LDL, HDL, VLDL, haemoglobin, creatinine, uric acid
-heart_relevant = false for everything else (thyroid, liver enzymes, vitamins, etc.)
+Rules:
+- Escape all special characters.
+- Do not use line breaks inside JSON strings.
+- status values only:
+normal, borderline, high, low, critical
 
-Be specific with the explanation for heart_relevant=true items. Keep explanations to 1-2 sentences."""
+Heart relevant true for:
+cholesterol,
+LDL,
+HDL,
+VLDL,
+triglycerides,
+glucose,
+HbA1c,
+blood pressure,
+CRP,
+homocysteine,
+haemoglobin,
+creatinine,
+uric acid
+
+Everything else false.
+"""
 
 
-def _encode_file(file_bytes: bytes, mime_type: str) -> dict:
-    b64 = base64.b64encode(file_bytes).decode("utf-8")
-    return {"inline_data": {"mime_type": mime_type, "data": b64}}
+def _encode_file(file_bytes, mime_type):
+
+    encoded = base64.b64encode(
+        file_bytes
+    ).decode("utf-8")
+
+    return {
+
+        "inline_data": {
+
+            "mime_type": mime_type,
+
+            "data": encoded
+
+        }
+
+    }
 
 
-def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
-    """
-    Sends file to Gemini Vision and returns structured analysis.
-    Returns: { heart_relevant: [...], other: [...], error: str|None }
-    """
-    if not GEMINI_API_KEY or GEMINI_API_KEY == "YOUR_GEMINI_API_KEY_HERE":
-        return {"error": "Gemini API key not configured.", "heart_relevant": [], "other": []}
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+def clean_gemini_json(raw):
+
+    raw = raw.strip()
+
+
+    # remove ```json wrappers
+
+    raw = re.sub(
+        r"```json",
+        "",
+        raw
+    )
+
+
+    raw = raw.replace(
+        "```",
+        ""
+    )
+
+
+    # find array
+
+    match = re.search(
+        r"\[.*\]",
+        raw,
+        re.DOTALL
+    )
+
+
+    if match:
+
+        raw = match.group()
+
+
+    return raw.strip()
+
+
+
+
+def analyse_blood_report(file_bytes, mime_type):
+
+
+    if not GEMINI_API_KEY:
+
+        return {
+
+            "error":"Gemini API key missing",
+
+            "heart_relevant":[],
+
+            "other":[]
+
+        }
+
+
+
+    url = (
+        f"https://generativelanguage.googleapis.com/"
+        f"v1beta/models/{GEMINI_MODEL}:generateContent"
+        f"?key={GEMINI_API_KEY}"
+    )
+
+
 
     payload = json.dumps({
-        "contents": [{
-            "role": "user",
-            "parts": [
-                _encode_file(file_bytes, mime_type),
-                {"text": ANALYSIS_PROMPT}
-            ]
-        }],
-        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 2000}
+
+
+        "contents":[
+
+            {
+
+                "role":"user",
+
+                "parts":[
+
+                    _encode_file(
+                        file_bytes,
+                        mime_type
+                    ),
+
+                    {
+                        "text":ANALYSIS_PROMPT
+                    }
+
+                ]
+
+            }
+
+        ],
+
+
+        "generationConfig":{
+
+            "temperature":0,
+
+            "maxOutputTokens":3000,
+
+            "response_mime_type":
+            "application/json"
+
+        }
+
+
     }).encode("utf-8")
 
+
+
     try:
-        req = urllib.request.Request(
-            url, data=payload,
-            headers={"Content-Type": "application/json"}
+
+
+        request = urllib.request.Request(
+
+            url,
+
+            data=payload,
+
+            headers={
+
+                "Content-Type":
+                "application/json"
+
+            }
+
         )
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
 
-        raw = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-        if raw.startswith("```"):
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        items = json.loads(raw.strip())
 
-        heart  = [i for i in items if i.get("heart_relevant")]
-        other  = [i for i in items if not i.get("heart_relevant")]
-        return {"heart_relevant": heart, "other": other, "error": None}
+
+        with urllib.request.urlopen(
+            request,
+            timeout=40
+        ) as response:
+
+
+            data=json.loads(
+
+                response.read()
+                .decode("utf-8")
+
+            )
+
+
+
+        raw = (
+
+            data["candidates"][0]
+            ["content"]
+            ["parts"][0]
+            ["text"]
+
+        )
+
+
+        print("====== GEMINI RAW ======")
+        print(raw)
+
+
+
+        try:
+
+            items=json.loads(
+                clean_gemini_json(raw)
+            )
+
+
+        except Exception:
+
+            return {
+
+                "error":
+                "AI response formatting failed. Try again.",
+
+                "heart_relevant":[],
+
+                "other":[]
+
+            }
+
+
+
+        heart=[
+
+            i for i in items
+
+            if i.get(
+                "heart_relevant"
+            )
+
+        ]
+
+
+        other=[
+
+            i for i in items
+
+            if not i.get(
+                "heart_relevant"
+            )
+
+        ]
+
+
+        return {
+
+            "heart_relevant":heart,
+
+            "other":other,
+
+            "error":None
+
+        }
+
+
 
     except Exception as e:
-        print(f"[Blood Analyser] Error: {e}")
-        return {"error": f"Analysis failed: {str(e)}", "heart_relevant": [], "other": []}
+
+
+        print(
+            "[Blood Analyzer ERROR]",
+            e
+        )
+
+
+        return {
+
+            "error":
+            f"Analysis failed: {e}",
+
+            "heart_relevant":[],
+
+            "other":[]
+
+        }
