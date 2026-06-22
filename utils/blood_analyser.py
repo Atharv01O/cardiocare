@@ -3,6 +3,7 @@ Analyses uploaded blood report (PDF or image) using Gemini Vision.
 Extracts heart-relevant values and flags abnormal ones.
 """
 
+import os
 import json
 import base64
 import urllib.request
