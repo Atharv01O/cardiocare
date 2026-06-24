@@ -42,7 +42,8 @@ Set heart_relevant to false for everything else (thyroid, vitamins, liver enzyme
 
 Rules:
 - Extract ALL tests visible, not just heart-related ones
-- Keep explanation to 1-2 sentences, specific to the actual value
+- Keep explanation under 80 characters
+- No special characters in explanation text
 - Do not use newlines inside string values
 - Escape any special characters in strings"""
 
@@ -148,7 +149,7 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
         }],
         "generationConfig": {
             "temperature": 0,
-            "maxOutputTokens": 3000,
+            "maxOutputTokens": 1000,
         },
     }).encode("utf-8")
 
