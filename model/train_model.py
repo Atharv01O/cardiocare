@@ -226,8 +226,7 @@ print(
 # SAVE
 # =========================
 
-model.save(MODEL_PATH, save_format='h5')  # saves as heart_model.h5
-
+model.export("model/saved_model")
 joblib.dump(
     scaler,
     SCALER_PATH
