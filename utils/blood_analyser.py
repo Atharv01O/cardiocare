@@ -159,7 +159,7 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
             data=payload,
             headers={"Content-Type": "application/json"},
         )
-        print("🔥🔥 NEW DEPLOY 24 JUNE TEST 🔥🔥")
+        print("🚀 CALLING GEMINI ONCE", flush=True)
         with urllib.request.urlopen(req, timeout=90) as resp:
             data = json.loads(resp.read().decode("utf-8"))
 
