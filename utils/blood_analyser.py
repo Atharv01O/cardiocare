@@ -187,12 +187,14 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
         }
   
     except urllib.error.HTTPError as e:
-        if e.code == 429:
-            return {
-                "error": "Too many requests — please wait 30 seconds and try again.",
-                "heart_relevant": [],
-                "other": [],
-            }
+     if e.code == 429:
+        import time
+        time.sleep(5)
+        return {
+            "error": "Gemini busy. Try again in a minute.",
+            "heart_relevant": [],
+            "other": [],
+        }
         print(f"[Blood Analyser ERROR] {e}")
         return {
             "error": f"Analysis failed: {e}",
