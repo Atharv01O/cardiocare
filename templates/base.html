@@ -40,7 +40,25 @@
       </a>
     </nav>
 
-    <div class="sidebar-footer">CardioCare v1.0</div>
+    <!-- Replace the existing sidebar-footer div in templates/base.html with this -->
+
+<div class="sidebar-footer">
+  <div class="health-tip-card" id="healthTipCard">
+    <div class="tip-header">
+      <span class="tip-icon" id="tipIcon">💡</span>
+      <span class="tip-label" id="tipLabel">HEART TIP</span>
+    </div>
+    <p class="tip-text" id="tipText">Loading tip...</p>
+    <div class="tip-dots">
+      <span class="tip-dot active" data-i="0"></span>
+      <span class="tip-dot" data-i="1"></span>
+      <span class="tip-dot" data-i="2"></span>
+      <span class="tip-dot" data-i="3"></span>
+      <span class="tip-dot" data-i="4"></span>
+    </div>
+  </div>
+  <div class="sidebar-version">CardioCare v1.0</div>
+</div>
   </aside>
 
   <main class="main-content">
@@ -121,6 +139,103 @@
         document.getElementById("profileDropdown")?.classList.remove("open");
       }
     });
+    // Health tips widget — rotates every 8 seconds
+// Add this inside the <script> block at the bottom of base.html
+
+const HEALTH_TIPS = [
+  {
+    icon: "🚨",
+    label: "HEART ATTACK SIGNS",
+    text: "Chest pain, left arm/jaw pain, cold sweat, nausea. Call emergency immediately — every minute matters."
+  },
+  {
+    icon: "💊",
+    label: "DURING ATTACK",
+    text: "Chew 325mg Aspirin immediately if not allergic. Sit down, loosen clothing, stay calm. Do NOT drive yourself."
+  },
+  {
+    icon: "🫀",
+    label: "CPR TIP",
+    text: "If someone collapses: call emergency, push hard & fast on centre of chest — 100-120 compressions/min."
+  },
+  {
+    icon: "💧",
+    label: "DAILY HABIT",
+    text: "Drink 8 glasses of water daily. Dehydration thickens blood and increases clot risk."
+  },
+  {
+    icon: "🧂",
+    label: "SODIUM WATCH",
+    text: "Limit sodium to under 2300mg/day. High salt raises blood pressure — the #1 risk factor for heart disease."
+  },
+  {
+    icon: "🚶",
+    label: "MOVE DAILY",
+    text: "30 minutes of brisk walking daily reduces heart disease risk by up to 35%. Start small, stay consistent."
+  },
+  {
+    icon: "😴",
+    label: "SLEEP MATTERS",
+    text: "Less than 6 hours of sleep raises heart attack risk by 20%. Aim for 7-9 hours every night."
+  },
+  {
+    icon: "🩺",
+    label: "CHECK BP",
+    text: "Normal BP is under 120/80 mmHg. Check it monthly. High BP has no symptoms until it's dangerous."
+  }
+];
+
+let currentTip = 0;
+let tipInterval = null;
+
+function showTip(index) {
+  const tip = HEALTH_TIPS[index];
+  const iconEl  = document.getElementById("tipIcon");
+  const labelEl = document.getElementById("tipLabel");
+  const textEl  = document.getElementById("tipText");
+
+  if (!iconEl || !labelEl || !textEl) return;
+
+  // Fade out
+  textEl.style.opacity = "0";
+
+  setTimeout(() => {
+    iconEl.textContent  = tip.icon;
+    labelEl.textContent = tip.label;
+    textEl.textContent  = tip.text;
+    textEl.style.opacity = "1";
+  }, 200);
+
+  // Update dots
+  document.querySelectorAll(".tip-dot").forEach((dot, i) => {
+    dot.classList.toggle("active", i === index % 5);
+  });
+}
+
+function initTips() {
+  // Start from a random tip
+  currentTip = Math.floor(Math.random() * HEALTH_TIPS.length);
+  showTip(currentTip);
+
+  // Rotate every 8 seconds
+  tipInterval = setInterval(() => {
+    currentTip = (currentTip + 1) % HEALTH_TIPS.length;
+    showTip(currentTip);
+  }, 8000);
+
+  // Click to advance manually
+  document.getElementById("healthTipCard")?.addEventListener("click", () => {
+    clearInterval(tipInterval);
+    currentTip = (currentTip + 1) % HEALTH_TIPS.length;
+    showTip(currentTip);
+    tipInterval = setInterval(() => {
+      currentTip = (currentTip + 1) % HEALTH_TIPS.length;
+      showTip(currentTip);
+    }, 8000);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initTips);
   </script>
   {% block extra_js %}{% endblock %}
 </body>

@@ -74,11 +74,72 @@ a:hover { text-decoration: underline; }
 .nav-link:active { transform: scale(0.98); }
 .nav-icon { font-size: 1rem; }
 
+/* ── Sidebar Footer Health Tips ── */
+/* Replace existing .sidebar-footer styles in base.css */
+
 .sidebar-footer {
-  padding: 16px 22px;
-  font-family: var(--font-mono);
-  font-size: 0.68rem; color: rgba(255,255,255,0.28);
+  padding: 12px;
   border-top: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+.health-tip-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 10px;
+}
+.health-tip-card:hover { background: rgba(255,255,255,0.08); }
+
+.tip-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+.tip-icon  { font-size: 1rem; }
+.tip-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+}
+
+.tip-text {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.55;
+  margin: 0;
+  transition: opacity 0.2s ease;
+  min-height: 52px;
+}
+
+.tip-dots {
+  display: flex;
+  gap: 5px;
+  margin-top: 9px;
+}
+.tip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.3s, transform 0.3s;
+}
+.tip-dot.active {
+  background: var(--accent);
+  transform: scale(1.2);
+}
+
+.sidebar-version {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.22);
+  text-align: center;
   letter-spacing: 0.03em;
 }
 
