@@ -149,7 +149,7 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
         }],
         "generationConfig": {
             "temperature": 0,
-            "maxOutputTokens": 1000,
+            "maxOutputTokens": 700,
         },
     }).encode("utf-8")
 
