@@ -160,9 +160,15 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
             headers={"Content-Type": "application/json"},
         )
         print("🚀 CALLING GEMINI ONCE", flush=True)
-        with urllib.request.urlopen(req, timeout=90) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
 
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                 print("✅ GEMINI RESPONDED", flush=True)
+                 data = json.loads(resp.read().decode("utf-8"))
+
+        except Exception as e:
+            print("🔥 GEMINI REQUEST FAILED:", repr(e), flush=True)
+            raise e
         raw = data["candidates"][0]["content"]["parts"][0]["text"]
         print("====== GEMINI RAW ======")
         print(raw[:500])
