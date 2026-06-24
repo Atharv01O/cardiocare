@@ -37,4 +37,4 @@ SECRET_KEY = "cardiocare-secret-2024"
 # =========================
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-2.0-flash"
