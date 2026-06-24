@@ -226,20 +226,12 @@ print(
 # SAVE
 # =========================
 
-model.export("model/heart_saved_model")
-
+model.save(MODEL_PATH, save_format='h5')  # saves as heart_model.h5
 
 joblib.dump(
     scaler,
     SCALER_PATH
 )
 
-
-print(
-    f"\nModel saved  → {MODEL_PATH}"
-)
-
-
-print(
-    f"Scaler saved → {SCALER_PATH}"
-)
+print(f"\nModel saved  → {MODEL_PATH}")
+print(f"Scaler saved → {SCALER_PATH}")
