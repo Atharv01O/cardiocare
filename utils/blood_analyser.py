@@ -14,39 +14,61 @@ from config import GEMINI_API_KEY, GEMINI_MODEL
 
 ANALYSIS_PROMPT = """You are a medical AI assistant analysing a blood test report.
 
-Extract EVERY test value visible in this report.
+Extract EVERY test value visible.
 
-Return ONLY a valid JSON array. No text before or after. No markdown. Start with [ end with ].
+Return ONLY valid JSON.
+No markdown.
+No text outside JSON.
 
-Each item must follow this exact format:
+Return format:
 [
-  {
-    "test": "Total Cholesterol",
-    "value": "245",
-    "unit": "mg/dL",
-    "normal_range": "< 200 mg/dL",
-    "status": "high",
-    "heart_relevant": true,
-    "explanation": "Your cholesterol of 245 mg/dL is above the healthy limit of 200. This increases risk of arterial plaque."
-  }
+{
+"test":"Total Cholesterol",
+"value":"245",
+"unit":"mg dL",
+"normal_range":"below 200 mg dL",
+"status":"high",
+"heart_relevant":true,
+"explanation":"Cholesterol value is higher than normal"
+}
 ]
 
-Status must be exactly one of: normal, borderline, high, low, critical
-
-Set heart_relevant to true ONLY for:
-cholesterol, LDL, HDL, VLDL, triglycerides, glucose, blood sugar, HbA1c,
-blood pressure, systolic, diastolic, CRP, homocysteine, haemoglobin,
-creatinine, uric acid, fibrinogen, ferritin, troponin
-
-Set heart_relevant to false for everything else (thyroid, vitamins, liver enzymes, WBC, platelets etc.)
-
 Rules:
-- Extract ALL tests visible, not just heart-related ones
-- Keep explanation under 80 characters
-- No special characters in explanation text
-- Do not use newlines inside string values
-- Escape any special characters in strings"""
+- JSON must start with [ and end with ]
+- Use double quotes only
+- No trailing commas
+- No newline characters inside values
+- No symbols like < > / \\ in string values
+- Use plain text units like mg dL
+- Explanation maximum 12 words
 
+Status options:
+normal
+borderline
+high
+low
+critical
+
+heart_relevant true ONLY:
+cholesterol
+LDL
+HDL
+VLDL
+triglycerides
+glucose
+blood sugar
+HbA1c
+blood pressure
+CRP
+homocysteine
+haemoglobin
+creatinine
+uric acid
+ferritin
+troponin
+
+Everything else heart_relevant false.
+"""
 
 def _encode_file(file_bytes: bytes, mime_type: str) -> dict:
     return {
@@ -174,7 +196,22 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
         print(raw[:500], flush=True)
         # Extract and parse the JSON array
         json_str = _extract_json_array(raw)
-        items    = json.loads(json_str)
+
+        try:
+            items = json.loads(json_str)
+
+        except json.JSONDecodeError:
+            print("❌ BAD GEMINI JSON:", json_str[:1000], flush=True)
+
+            # attempt simple cleanup
+            cleaned = (
+                json_str
+                .replace("\n", " ")
+                .replace(",]", "]")
+                .replace(",}", "}")
+           )
+
+            items = json.loads(cleaned)
 
         if not isinstance(items, list):
             raise ValueError("Response is not a JSON array")
