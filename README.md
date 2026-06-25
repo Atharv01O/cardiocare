@@ -104,6 +104,7 @@ cardiocare/
 
 ### Gemini Blood Report Analysis
 ![Blood](screenshots/bloodrp_analysis.jpeg)
+![Blood](screenshots/bpanalysis.jpeg)
 
 ### AI Assistant
 ![Assistant](screenshots/chat_bot.jpeg)
