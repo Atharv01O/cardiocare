@@ -170,9 +170,8 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
             print("🔥 GEMINI REQUEST FAILED:", repr(e), flush=True)
             raise e
         raw = data["candidates"][0]["content"]["parts"][0]["text"]
-        print("====== GEMINI RAW ======")
-        print(raw[:500])
-
+        print("====== GEMINI RAW ======", flush=True)
+        print(raw[:500], flush=True)
         # Extract and parse the JSON array
         json_str = _extract_json_array(raw)
         items    = json.loads(json_str)
@@ -194,24 +193,29 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
         }
   
     except urllib.error.HTTPError as e:
-     if e.code == 429:
-        import time
-        time.sleep(5)
+        error_body = e.read().decode("utf-8")
+        print("🔥 GEMINI HTTP ERROR:", e.code, error_body, flush=True)
+
+        if e.code == 429:
+            return {
+                "error": "Gemini busy. Try again in a minute.",
+                "heart_relevant": [],
+                "other": [],
+            }
+
         return {
-            "error": "Gemini busy. Try again in a minute.",
+            "error": f"Gemini failed with code {e.code}",
             "heart_relevant": [],
             "other": [],
         }
-        print(f"[Blood Analyser ERROR] {e}")
-        return {
-            "error": f"Analysis failed: {e}",
-            "heart_relevant": [],
-            "other": [],
-        }
+
+
     except Exception as e:
-        print(f"[Blood Analyser ERROR] {e}")
+        import traceback
+        traceback.print_exc()
+
         return {
-            "error": f"Analysis failed: {e}",
+            "error": f"Analysis failed: {str(e)}",
             "heart_relevant": [],
             "other": [],
         }
