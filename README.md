@@ -112,7 +112,7 @@ cardiocare/
 ![Compare](screenshots/compare.jpeg)
 ![Compare](screenshots/compare1.jpeg)
 
-### Report Comparison
+### Model Information
 ![Model_info](screenshots/model-info.jpeg)
 
 ## ⚙️ Setup
