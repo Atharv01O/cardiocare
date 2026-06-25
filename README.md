@@ -97,10 +97,10 @@ cardiocare/
 
 ### Risk Prediction
 ![Prediction](screenshots/prediction_form.jpeg)
-![Prediction](screenshots/prediction.jpeg)
+![Prediction](screenshots/prediction_result.jpeg)
 
 ### Gemini Blood Report Analysis
-![Blood](screenshots/bloodrp_analysis.png)
+![Blood](screenshots/bloodrp_analysis.jpeg)
 
 ### AI Assistant
 ![Assistant](screenshots/chat_bot.jpeg)
@@ -125,11 +125,8 @@ pip install -r requirements.txt
 ```
 
 Add environment variables:
-
-```env
-GEMINI_API_KEY=
-MONGO_URI=
-```
+GEMINI_API_KEY=your_gemini_api_key
+MONGO_URI=your_mongodb_connection_string
 
 Run:
 
