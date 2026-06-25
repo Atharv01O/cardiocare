@@ -38,9 +38,11 @@ Rules:
 - Use double quotes only
 - No trailing commas
 - No newline characters inside values
-- No symbols like < > / \\ in string values
+- Use proper medical units like mg/dL, %, g/dL
+- Escape JSON special characters correctly
 - Use plain text units like mg dL
-- Explanation maximum 12 words
+- Explanation maximum 15 words
+- Explain the health meaning, not just whether value is high or low
 
 Status options:
 normal
@@ -66,6 +68,13 @@ creatinine
 uric acid
 ferritin
 troponin
+
+Medical interpretation:
+- High LDL is bad
+- High triglycerides are bad
+- High HDL is usually protective
+- Low HDL increases heart risk
+- High glucose and HbA1c indicate diabetes risk
 
 Everything else heart_relevant false.
 """
