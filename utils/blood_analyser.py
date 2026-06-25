@@ -203,13 +203,9 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
         except json.JSONDecodeError:
             print("❌ BAD GEMINI JSON:", json_str[:1000], flush=True)
 
-            # attempt simple cleanup
-            cleaned = (
-                json_str
-                .replace("\n", " ")
-                .replace(",]", "]")
-                .replace(",}", "}")
-           )
+            cleaned = re.sub(r"[\x00-\x1F]+", " ", json_str)
+            cleaned = re.sub(r",\s*]", "]", cleaned)
+            cleaned = re.sub(r",\s*}", "}", cleaned)
 
             items = json.loads(cleaned)
 
