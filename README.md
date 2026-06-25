@@ -11,6 +11,9 @@ CardioCare is a full-stack AI healthcare analytics application that predicts car
 - 📈 Prediction history and report comparison
 - 📄 Automatic PDF report generation
 
+## 🌐 Live Demo
+
+https://cardiocare-1-9ofo.onrender.com/
 
 ## 🛠 Tech Stack
 
@@ -108,6 +111,9 @@ cardiocare/
 ### Report Comparison
 ![Compare](screenshots/compare.jpeg)
 ![Compare](screenshots/compare1.jpeg)
+
+### Report Comparison
+![Model_info](screenshots/model-info.jpeg)
 
 ## ⚙️ Setup
 
