@@ -1,70 +1,150 @@
----
-title: CardioCare
-emoji: ❤️
-colorFrom: red
-colorTo: pink
-sdk: docker
-app_port: 7860
----
+# ❤️ CardioCare - AI Heart Risk Prediction Platform
 
-# CardioCare — Heart Disease Prediction
+CardioCare is a full-stack AI healthcare analytics application that predicts cardiovascular disease risk and provides AI-powered health insights using Machine Learning and Gemini AI.
 
-A Flask web app using a deep learning model to predict heart disease risk.
+## 🚀 Features
 
-## Project Structure
+- 🧠 Heart disease risk prediction using Deep Learning
+- 🩸 Blood report analysis using Gemini Vision AI
+- 🤖 AI chatbot for explaining medical values
+- 📊 Interactive health dashboard
+- 📈 Prediction history and report comparison
+- 📄 Automatic PDF report generation
+
+
+## 🛠 Tech Stack
+
+**Frontend**
+- HTML
+- CSS
+- JavaScript
+- Chart.js
+
+**Backend**
+- Flask
+- MongoDB
+- REST APIs
+
+**Machine Learning**
+- TensorFlow / Keras
+- Scikit-learn
+- NumPy / Pandas
+
+**AI**
+- Google Gemini API
+- Gemini Vision
+
+**Deployment**
+- Docker
+- Render
+
+
+## 🧠 AI Model
+
+Dataset: UCI Cleveland Heart Disease Dataset
+
+Architecture:
+
 ```
+Input Layer
+    ↓
+Dense(128) + ReLU
+    ↓
+BatchNorm + Dropout
+    ↓
+Dense(64) + ReLU
+    ↓
+Dense(32) + ReLU
+    ↓
+Sigmoid Output
+```
+
+- 13 clinical features
+- Binary classification model
+- Risk probability output (0-100%)
+
+
+## 📂 Project Structure
+
+```bash
 cardiocare/
-├── app.py                  # Flask routes
-├── config.py               # Paths & MongoDB config
+│
+├── app.py
+├── config.py
 ├── requirements.txt
+│
 ├── model/
-│   └── train_model.py      # Run this first!
+│   ├── train_model.py
+│   └── saved_model/
+│
 ├── utils/
-│   ├── predictor.py        # Model inference
-│   ├── risk_engine.py      # Risk levels + care tips
-│   └── pdf_generator.py    # PDF report builder
-├── static/css/             # Stylesheets
-├── static/js/              # Chart.js + form logic
-├── templates/              # Jinja2 HTML pages
+│   ├── predictor.py
+│   ├── blood_analyser.py
+│   ├── gemini_chat.py
+│   └── pdf_generator.py
+│
+├── static/
+├── templates/
 ├── dataset/
-│   └── heart.csv           # UCI Cleveland dataset
-└── reports/                # Generated PDFs (auto-created)
+└── reports/
 ```
 
-## Setup & Run
 
-### 1. Install dependencies
+## 📸 Screenshots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.jpeg)
+
+### Risk Prediction
+![Prediction](screenshots/prediction_form.jpeg)
+![Prediction](screenshots/prediction.jpeg)
+
+### Gemini Blood Report Analysis
+![Blood](screenshots/bloodrp_analysis.png)
+
+### AI Assistant
+![Assistant](screenshots/chat_bot.jpeg)
+
+### Report Comparison
+![Compare](screenshots/compare.jpeg)
+![Compare](screenshots/compare1.jpeg)
+
+## ⚙️ Setup
+
+Clone repository:
+
+```bash
+git clone <repo-url>
+cd cardiocare
+```
+
+Install packages:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Add your dataset
-Place your `heart.csv` inside the `dataset/` folder.
+Add environment variables:
 
-### 3. Train the model (run once)
-```bash
-python model/train_model.py
-```
-This creates `model/heart_model.h5` and `model/scaler.pkl`.
-
-### 4. Start MongoDB
-```bash
-mongod
+```env
+GEMINI_API_KEY=
+MONGO_URI=
 ```
 
-### 5. Run the app
+Run:
+
 ```bash
 python app.py
 ```
 
-Open http://localhost:5000 in your browser.
 
-## Pages
-| Route      | Description                        |
-|------------|------------------------------------|
-| /          | Dashboard with charts & stats      |
-| /predict   | Enter patient data, get prediction |
-| /history   | View & delete past reports         |
-| /model     | Model architecture & feature info  |
-| /download/<file> | Download PDF report          |
-"# cardiocare" 
+## ⚠️ Disclaimer
+
+CardioCare is an educational AI project and should not replace professional medical advice.
+
+
+## 👨‍💻 Developer
+
+**Atharv Devrukhkar**
+
+Machine Learning | Data Science | Data Analysis
