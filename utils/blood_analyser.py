@@ -171,7 +171,7 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
         }],
         "generationConfig": {
             "temperature": 0,
-            "maxOutputTokens": 700,
+            "maxOutputTokens": 4096,
         },
     }).encode("utf-8")
 
@@ -193,7 +193,7 @@ def analyse_blood_report(file_bytes: bytes, mime_type: str) -> dict:
             raise e
         raw = data["candidates"][0]["content"]["parts"][0]["text"]
         print("====== GEMINI RAW ======", flush=True)
-        print(raw[:500], flush=True)
+        print(raw, flush=True)
         # Extract and parse the JSON array
         json_str = _extract_json_array(raw)
 
